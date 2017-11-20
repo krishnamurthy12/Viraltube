@@ -226,11 +226,10 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
                 @Override
                 public void onResponse(Call<PromoteResponse> call, Response<PromoteResponse> response) {
                     if (response.body().getRESPONSECODE().equalsIgnoreCase("200")) {
-                        //levelOneFragment.refreshContent();
-                        //refreshdialog = new SpotsDialog(context,"Refreshing Please wait...");
-                        //refreshdialog.show();
-                        Snackbar.make(holder.mPromote,"Your video promoted please refresh the page",Snackbar.LENGTH_SHORT)
-                                .show();
+
+                        levelOneFragment.onRefresh();
+                       /* Snackbar.make(holder.mPromote,"Your video promoted please refresh the page",Snackbar.LENGTH_SHORT)
+                                .show();*/
 
                     } else if (response.body().getRESPONSECODE().equalsIgnoreCase("403")) {
 
@@ -272,6 +271,33 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
             public boolean onTouch(View v, MotionEvent event) {
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom);
                 holder.mVotes.startAnimation(animation);
+                return false;
+
+            }
+        });
+        holder.mPromote.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom);
+                holder.mPromote.startAnimation(animation);
+                return false;
+
+            }
+        });
+        holder.mShare.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom);
+                holder.mShare.startAnimation(animation);
+                return false;
+
+            }
+        });
+        holder.mContact.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom);
+                holder.mContact.startAnimation(animation);
                 return false;
 
             }

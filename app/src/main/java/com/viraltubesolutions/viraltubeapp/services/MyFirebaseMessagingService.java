@@ -9,20 +9,13 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.shareResponse.ShareResponse;
 import com.viraltubesolutions.viraltubeapp.R;
 import com.viraltubesolutions.viraltubeapp.activities.SharedActivity;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 /*
     Created by Shashi on 11/16/2017.
@@ -49,15 +42,22 @@ import java.util.ArrayList;
         }
 
 */
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            /*SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Gson gson = new Gson();
             String json = sharedPrefs.getString("Data", null);
             Type type = new TypeToken<ArrayList<ShareResponse>>() {}.getType();
             ArrayList<ShareResponse> arrayList = gson.fromJson(json, type);
             sendNotification(remoteMessage.getData().get("message"),"VT");
+            remoteMessage.getData().get("url").toString();
+
+            */
+            SharedPreferences responsePreference=getSharedPreferences("RESPONSEDATA",MODE_PRIVATE);
+            SharedPreferences.Editor editor=responsePreference.edit();
+            editor.putString("RESPONSEURL", remoteMessage.getData().get("url"));
+            editor.apply();
 
             Log.d("message","Message"+ remoteMessage.getData().get("message"));
-            //sendNotification(message,"VT");
+            sendNotification(remoteMessage.getData().get("message"),"VT");
         }
         private void sendNotification(String messageBody,String title) {
             if(title==null){
@@ -92,7 +92,7 @@ import java.util.ArrayList;
                 builder.setSmallIcon(R.drawable.icon_web);
             }
             Notification myNotification=   builder.setContentTitle(messageBody)
-                    .setContentText("Hello")
+                    .setContentText("hello")
                     .setTicker(title)
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)

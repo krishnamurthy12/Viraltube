@@ -5,17 +5,9 @@
     android:layout_height="match_parent"
     tools:context="com.viraltubesolutions.viraltubeapp.activities.SharedActivity">
 
-   <!-- <android.support.v7.widget.RecyclerView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_sharedvideo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />-->
-    <com.viraltubesolutions.videoplayerlibrary.customview.JZVideoPlayerStandard
-        android:id="@+id/videoplayer_as"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginTop="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        />
 </RelativeLayout>

@@ -1,25 +1,40 @@
 package com.viraltubesolutions.viraltubeapp.adapters;
 
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.SeekBar;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.bumptech.glide.Glide;
 import com.viraltubesolutions.videoplayerlibrary.customview.JZVideoPlayerStandard;
-import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.shareResponse.ShareResponse;
+import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.numberOfViews.NumOfViewsResponse;
+import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.numberOfVotes.NumOfVotesResponse;
 import com.viraltubesolutions.viraltubeapp.R;
+import com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView;
+import com.viraltubesolutions.viraltubeapp.utils.ViralTubeAPI;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
 
 import dmax.dialog.SpotsDialog;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Shashi on 11/17/2017.
@@ -31,11 +46,13 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
     int numOfvotes;
     int numOfViews;
     Context context;
-    ArrayList<ShareResponse> arrayList;
+    //ArrayList<ShareResponse> arrayList;
+    String[] z;
 
-    public SharedVideoAdapter(Context context, String userID, SpotsDialog loadingDialog) {
+    public SharedVideoAdapter(Context context, String userID,String[] z, SpotsDialog loadingDialog) {
         this.context=context;
         this.mUserID=userID;
+        this.z=z;
         if(loadingDialog.isShowing())
         {
             loadingDialog.dismiss();
@@ -44,7 +61,7 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
-        public TextView title, views, votes;
+        public MyCustomTextView title, views, votes;
         ImageView mVotes,mPromote,mShare,mContact;
         JZVideoPlayerStandard jzVideoPlayerStandard;
 
@@ -61,11 +78,6 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
             mShare=itemView.findViewById(R.id.vI_ssa_share);
             mContact=itemView.findViewById(R.id.vI_ssa_contact);
 
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-            Gson gson = new Gson();
-            String json = sharedPrefs.getString("Data", null);
-            Type type = new TypeToken<ArrayList<ShareResponse>>() {}.getType();
-            arrayList= gson.fromJson(json, type);
         }
     }
     @Override
@@ -77,31 +89,42 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
     @Override
     public void onBindViewHolder(final MyHolder holder, final int position) {
-    }
 
-       /* if (arrayList.get(position).getUserVote() == 1) {
+       /* String thumburl=String.valueOf(z[8]).replaceAll("\\\\", File.separator);
+        String videourl=String.valueOf(z[3]).replaceAll("\\\\",File.separator);*/
+        String thumburl=String.valueOf(z[8]).replace('\\','/');
+        String videourl=String.valueOf(z[3]).replace('\\','/');
+        String finalvideourl=videourl.replaceAll("////","//");
+        String finalthumburl=thumburl.replaceAll("////","//");
+
+
+        Log.d("replacedurl",finalvideourl+"   "+finalthumburl);
+
+
+        if (z[1].equalsIgnoreCase("1")) {
             holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
-            holder.votes.setText(arrayList.get(position).getVoteCount() + " Votes");
+            holder.votes.setText(z[6] + " Votes");
 
         } else {
             holder.mVotes.setImageResource(R.drawable.vote);
-            holder.votes.setText(arrayList.get(position).getVoteCount() + " Votes");
+            holder.votes.setText(z[6] + " Votes");
 
         }
 
-        numOfViews = arrayList.get(position).getViewCount();
-        numOfvotes = arrayList.get(position).getVoteCount();
+        numOfViews =Integer.parseInt(String.valueOf(z[7]));
+        numOfvotes =Integer.parseInt(String.valueOf(z[6]));
 
-        holder.title.setText(arrayList.get(position).getTitle());
-        holder.views.setText(arrayList.get(position).getViewCount() + " Views");
-        holder.votes.setText(arrayList.get(position).getVoteCount() + " Votes");
+        holder.title.setText(z[5]);
+        holder.views.setText(z[7] + " Views");
+        holder.votes.setText(z[6] + " Votes");
 
 
-        holder.jzVideoPlayerStandard.setUp(arrayList.get(position).getVideoUrl(), JZVideoPlayerStandard.SCREEN_LAYOUT_NORMAL, " ");
+        holder.jzVideoPlayerStandard.setUp(finalvideourl.trim(), JZVideoPlayerStandard.SCREEN_LAYOUT_NORMAL, " ");
         holder.jzVideoPlayerStandard.progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.d("Here", progress + " ");
+
                 if (progress > 35) {
                     Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl("https://viraltube.co.in/vt/")
@@ -110,18 +133,18 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
                     ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-                    Call<NumOfViewsResponse> call = viralTubeAPI.getViews(mUserID, arrayList.get(position).getId());
+                    Call<NumOfViewsResponse> call = viralTubeAPI.getViews(mUserID,z[4]);
                     //Call<NumOfViewsResponse> call =  viralTubeAPI.getViews(mUserID,mlist.get(position).getVideoId());
                     call.enqueue(new Callback<NumOfViewsResponse>() {
                         @Override
                         public void onResponse(Call<NumOfViewsResponse> call, Response<NumOfViewsResponse> response) {
 
                             if (response.body().getrESPONSECODE().equalsIgnoreCase("200")) {
-                                numOfViews = arrayList.get(position).getViewCount() + 1;
+                                numOfViews = Integer.parseInt(String.valueOf(z[7])) + 1;
                                 holder.views.setText(numOfViews + " Views");
 
                             } else if (response.body().getrESPONSECODE().equalsIgnoreCase("405")) {
-                                holder.views.setText(arrayList.get(position).getViewCount() + " Views");
+                                holder.views.setText(z[7] + " Views");
                             }
 
                         }
@@ -145,7 +168,7 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
             }
         });
         Glide.with(context)
-                .load(arrayList.get(position).getThumbnailUrl())
+                .load(finalthumburl.trim())
                 //.load(mlist.get(position).getVideoThumb())
                 .into(holder.jzVideoPlayerStandard.thumbImageView);
 
@@ -161,19 +184,19 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
                         .build();
                 ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-                Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID, arrayList.get(position).getId());
+                Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID,z[4]);
                 //Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID, mlist.get(position).getVideoId());
                 call.enqueue(new Callback<NumOfVotesResponse>() {
                     @Override
                     public void onResponse(Call<NumOfVotesResponse> call, Response<NumOfVotesResponse> response) {
                         if (response.body().getRESPONSECODE().equalsIgnoreCase("200")) {
-                            numOfvotes = arrayList.get(position).getVoteCount() + 1;
+                            numOfvotes =Integer.parseInt(String.valueOf(z[6])) + 1;
                             holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
                             holder.votes.setText(numOfvotes + " Votes");
                         } else if (response.body().getRESPONSECODE().equalsIgnoreCase("405")) {
                             Snackbar.make(holder.mVotes, "Sorry you can vote only once", Snackbar.LENGTH_SHORT).show();
                             holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
-                            holder.votes.setText(arrayList.get(position).getVoteCount() + " Votes");
+                            holder.votes.setText(z[6] + " Votes");
 
                         }
 
@@ -193,13 +216,11 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.setType("image*//*");
+                shareIntent.setType("image");
                 //shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, getImageUri(context, getBitmapFromView(holder.jzVideoPlayerStandard.thumbImageView)));
                 shareIntent.putExtra(Intent.EXTRA_TEXT, "\n" + context.getPackageName() + "\n" +
-                        arrayList.get(position).getTitle() + "\n file:" + arrayList.get(position).getVideoUrl());
-               *//* shareIntent.putExtra(Intent.EXTRA_TEXT, "\n"+context.getPackageName()+"\n"+
-                        mlist.get(position).getVideoTitle()+"\n file:"+mlist.get(position).getVideoUrl());*//*
+                        z[5] + "\n file:" + z[3]);
 
                 if (shareIntent.resolveActivity(context.getPackageManager()) != null) {
                     context.startActivity(Intent.createChooser(shareIntent, "Share using"));
@@ -212,8 +233,8 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
             //Define a bitmap with the same size as the view
             Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
 
-       *//* Bitmap resizedBitmap = Bitmap.createScaledBitmap(returnedBitmap,(int)(returnedBitmap.getWidth()*0.4),
-                (int)(returnedBitmap.getHeight()*0.4), true);*//*
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(returnedBitmap,(int)(returnedBitmap.getWidth()*0.4),
+                (int)(returnedBitmap.getHeight()*0.4), true);
             //Bind a canvas to it
             Canvas canvas = new Canvas(returnedBitmap);
             //Get the view's background
@@ -237,11 +258,11 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
-    }*/
+    }
 
     @Override
     public int getItemCount() {
-        return arrayList.size();
+        return 1;
     }
 
 }

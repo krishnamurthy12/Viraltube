@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout_contacts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <!--<ListView
+        android:id="@+id/contacts_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        >
+    </ListView>-->
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:dividerHeight="0dp"
+            android:divider="@null">
+
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+    <LinearLayout
+        android:id="@+id/nomatch_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+        <com.viraltubesolutions.viraltubeapp.customs.CircleImageView
+            android:id="@+id/nomatch_image"
+            android:layout_width="@dimen/nomatchicon_width"
+            android:layout_height="@dimen/nomatchicon_height"
+            android:layout_gravity="center"
+            android:src="@drawable/nomatch"/>
+        <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/dark_gray"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:textSize="@dimen/text_view_size_xlarge"
+            android:text="@string/sorry_no_contacts_matched"/>
+
+    </LinearLayout>
+   <!-- <TextView
+        android:id="@+id/vT_fc_emptycontactlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="22sp"
+        android:visibility="gone"/>-->
+
+</RelativeLayout>

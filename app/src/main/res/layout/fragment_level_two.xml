@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/leveltwoMainlayout"
+    tools:context="com.viraltubesolutions.viraltubeapp.fragments.LevelTwoFragment">
+
+    <LinearLayout
+        android:id="@+id/shortagevoteslayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/shortageofvotes"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/vB_flt_gotolevelone"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:paddingLeft="@dimen/button_paddingLeft"
+            android:paddingRight="@dimen/button_paddingRight"
+            android:text="@string/go_to_level1"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/button_txt18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/paymentlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/buypremium"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/vB_flt_buypremium"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:paddingLeft="@dimen/button_paddingLeft"
+            android:paddingRight="@dimen/button_paddingRight"
+            android:text="@string/getpremium"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/button_txt18sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/mainlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView_level1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

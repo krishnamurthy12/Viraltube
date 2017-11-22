@@ -1,0 +1,36 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 22
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    configurations {
+        all*.exclude group: 'org.apache.commons'
+    }
+
+}
+
+dependencies {
+
+
+    compile ('com.android.support:support-v4:25.3.1'){
+        exclude module: 'commons-io'
+    }
+
+
+
+    testCompile 'junit:junit:4.12'
+    compile files('libs/MobilePaymentSDKOutput.jar')
+    compile files('libs/secure-data.jar')
+    compile files('libs/xercesImpl-2.6.2-jaxb-1.0.6.jar')
+}

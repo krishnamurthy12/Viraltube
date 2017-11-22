@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.viraltubesolutions.viraltubeapp.activities.SignupActivity">
+    <ScrollView
+        android:id="@+id/vS_as_signup_userinfo"
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="90dp"
+                android:src="@drawable/icon_web"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:id="@+id/splash_screen_image"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                >
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/text_viral"
+                    android:textSize="40sp"
+                    android:layout_gravity="center"
+                    android:textColor="@color/colorPrimary"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="fill"
+                    android:layout_marginLeft="8dp"
+                    android:text="@string/text_tube"
+                    android:textSize="40sp"
+                    android:background="#AA00FF"
+                    android:textColor="@color/colorwhite"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/signup_username_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:src="@drawable/username"
+                    android:paddingLeft="10sp"
+                    android:layout_gravity="center"/>
+
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_name"
+                        android:paddingLeft="10sp"
+                        android:inputType="textPersonName"
+                        android:maxLines="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/signup_email_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/email" />
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:paddingLeft="10sp"
+                        android:hint="@string/hint_email"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/signup_phonenumber_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/call" />
+
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_phonenumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_phone_number"
+                        android:inputType="phone"
+                        android:maxLength="10"
+                        android:paddingLeft="10sp"
+                        android:layout_gravity="center"
+                        />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/signup_password_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/password" />
+
+
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_password"
+                        android:paddingLeft="10sp"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/signup_gender_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/gender" />
+
+                <Spinner
+                    android:id="@+id/vS_as_gender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10sp"
+                    android:spinnerMode="dropdown" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/signup_age_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/age" />
+
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_age"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_age"
+                        android:inputType="numberDecimal"
+                        android:paddingLeft="10sp"
+                        android:maxLength="2"
+                         />
+            </LinearLayout>
+
+
+            <RadioGroup
+                android:id="@+id/signup_radiogroup_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                >
+
+                <RadioButton
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:id="@+id/vR_as_individual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:text="@string/radio_individual"
+                    />
+
+                <RadioButton
+                    android:id="@+id/vR_as_college"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="80dp"
+                    android:text="@string/radio_college" />
+            </RadioGroup>
+
+
+            <LinearLayout
+                android:id="@+id/signup_location_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:background="@drawable/edittextstyle">
+
+                <ImageView
+
+                    android:layout_width="@dimen/icondimens"
+                    android:layout_height="@dimen/icondimens"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10sp"
+                    android:src="@drawable/location" />
+
+                    <com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText
+                        android:id="@+id/vE_as_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/edit_text_height"
+                        android:background="@android:color/transparent"
+                        android:paddingLeft="10sp"
+                        android:hint="@string/hint_location"
+                        android:inputType="textPostalAddress"
+                        android:maxLines="2" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/signup_termsandconditions_layout"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginBottom="10dp">
+
+                <CheckBox
+                    android:id="@+id/vC_as_terms_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="5dp"
+                    android:checked="true"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:textColor="@color/colorPrimary" />
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:id="@+id/vT_as_terms_condition"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:paddingLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/terms_and_conditions"
+                    android:textSize="@dimen/text_view_size_small"
+                    android:textColor="@color/colorPrimary"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/vS_as_signup_userinfo">
+        <Button
+            android:id="@+id/vB_as_signup"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:paddingRight="@dimen/button_paddingRight"
+            android:paddingLeft="@dimen/button_paddingLeft"
+            android:background="@color/colorPrimary"
+            android:textAllCaps="false"
+            android:text="@string/register"
+            android:textSize="@dimen/button_txt16sp"
+            android:textColor="@color/colorwhite"
+            android:gravity="center"
+            />
+    </RelativeLayout>
+
+
+</RelativeLayout>

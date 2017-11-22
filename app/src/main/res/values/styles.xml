@@ -1,0 +1,57 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!--to add custom theme for toolbar-->
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
+    </style>
+
+    <!--change popup menu background to Light color-->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >
+
+    </style>
+
+    <style name="navigationdrawerTextAppearance"
+        parent="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/blue_btn</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+ <!--   &lt;!&ndash;to change textinputlayout hint color and size from default to custom &ndash;&gt;
+    <style name="TextAppearence.App.TextInputlayout" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:textSize">14sp</item>
+    </style>-->
+
+    <!--to change navigation hamburger color-->
+    <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@color/colorPrimary</item>
+    </style>
+    <!--to add ripple effects for selected items-->
+    <style name="colorControlHighlight_blue">
+        <item name="colorControlHighlight">@color/colorPrimary</item>
+    </style>
+
+    <!--custom style for sportsDialog-->
+    <style name="Customsportsdialog" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogTitleText">Updating…</item>
+        <item name="DialogSpotColor">@android:color/holo_orange_dark</item>
+        <item name="DialogSpotCount">4</item>
+    </style>
+
+
+</resources>

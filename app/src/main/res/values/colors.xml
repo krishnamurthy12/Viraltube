@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#3F51B5</color>
+    <color name="accent">#FF4081</color>
+
+    <color name="splashscreen">#1565C0</color>
+    <color name="colorwhite">#ffffff</color>
+    <color name="appBlue">#1565C0</color>
+    <color name="black">#000000</color>
+    <color name="blue_text">#8EC3E4</color>
+    <color name="blue_btn">#2C8ECD</color>
+    <color name="gray">#ECEFF1</color>
+    <color name="dark_gray">#A9A9A9</color>
+    <color name="green">#28FF28</color>
+
+    <color name="snackbar_text">#fff</color>
+    <color name="snackbar_color">#FF11C9C7</color>
+</resources>

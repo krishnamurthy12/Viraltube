@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_background"
+    >
+
+    <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Are you sure to Logout ?"
+        android:textSize="22sp"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:textColor="@color/colorPrimary"
+        android:layout_gravity="center"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/vB_flo_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="right|center"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/colorwhite"
+            android:textSize="@dimen/button_txt18sp" />
+
+        <Button
+
+            android:id="@+id/vB_flo_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="right|center"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="LogOut"
+            android:textAllCaps="false"
+            android:textColor="@color/colorwhite"
+            android:textSize="@dimen/button_txt18sp" />
+    </LinearLayout>
+
+</LinearLayout>
+

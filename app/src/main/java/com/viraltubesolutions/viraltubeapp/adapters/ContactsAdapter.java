@@ -69,7 +69,7 @@ public class ContactsAdapter extends ArrayAdapter<ContactsBeanClass> {
         }
         Random rnd = new Random();
         int color= Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-        TextDrawable drawable= TextDrawable.builder().buildRound(contactList.get(position).getContactPic()+"",color);
+        TextDrawable drawable=TextDrawable.builder().buildRound(contactList.get(position).getContactPic()+"",color);
         holder.contactChar.setImageDrawable(drawable);
         //holder.contactChar.setBackgroundColor(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
         //holder.contactChar.setBackground(contactList.get(position).getContactPic()+"");

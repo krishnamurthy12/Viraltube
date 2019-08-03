@@ -1,1 +1,1 @@
-include ':app', ':videoplayerlibrary', ':libraryMobilePaymentSDK'
+include ':app', ':libraryMobilePaymentSDK', ':jiaozivideoplayer'

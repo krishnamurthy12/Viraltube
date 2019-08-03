@@ -12,25 +12,20 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
-        android:name="com.viraltubesolutions.viraltubeapp.app_controller.AppController"
-        android:hardwareAccelerated="true"
-        android:largeHeap="true"
+        android:name=".app_controller.AppController"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/icon_web"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@drawable/icon_web"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service android:name=".services.MyFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
+
 
         <activity
             android:name=".SplashScreenActivity"
@@ -40,12 +35,20 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="com.viraltubesolutions.viraltubeapp"
+                    android:scheme="https" />
+                <data
+                    android:host="com.viraltubesolutions.viraltubeapp"
+                    android:scheme="http" />
+            </intent-filter>
         </activity>
-
-        <service
-            android:name=".services.UploadingService"
-            android:exported="false" />
-
         <activity
             android:name=".activities.LoginActivity"
             android:configChanges="screenSize|orientation|keyboardHidden"
@@ -61,13 +64,16 @@
             android:configChanges="screenSize|orientation|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.MPSActivity"
-            android:configChanges="screenSize|orientation|keyboardHidden"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity
             android:name="com.atom.mobilepaymentsdk.PayActivity"
-            android:label="@string/app_name" />
+            android:configChanges="screenSize|orientation|keyboardHidden"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+
+        <service android:name=".services.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
 
         <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
@@ -75,7 +81,15 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.SharedActivity"></activity>
+        <activity android:name=".activities.SharedVideoActivity" />
+        <activity android:name=".activities.ViralTubePaymentActivity" />
+        <activity android:name=".activities.CatagoriesActivity" />
+        <activity android:name=".activities.SubCatagoriesActivity" />
+        <activity android:name=".activities.DynamicLinkOpenActivity" />
+        <activity android:name=".utils.CrashActivity" />
+        <activity android:name=".activities.AboutUsActivity" />
+        <activity android:name=".activities.TermsnConditions" />
+        <activity android:name=".activities.WebViewActivity"></activity>
     </application>
 
 </manifest>

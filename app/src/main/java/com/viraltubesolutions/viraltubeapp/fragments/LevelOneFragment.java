@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -41,17 +44,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.SelfUploadResponse;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.fcmResponse.FCMResponse;
-import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.numberOfVotes.NumOfVotesResponse;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.originalVideos.OriginalVideos;
+import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.uploadedVideoResponse.AllVideosByLimit;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.uploadedVideoResponse.Datum;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.uploadedVideoResponse.UploadedVideosResponse;
+import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.uploadlimitcheck.UploadLimitCheck;
 import com.viraltubesolutions.viraltubeapp.R;
+import com.viraltubesolutions.viraltubeapp.activities.HomePageActivity;
 import com.viraltubesolutions.viraltubeapp.adapters.LevelOneAdapter;
+import com.viraltubesolutions.viraltubeapp.beanclasses.VideoData1;
+import com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView;
+import com.viraltubesolutions.viraltubeapp.utils.EndlessRecyclerOnScrollListener;
 import com.viraltubesolutions.viraltubeapp.utils.OnResponseListener;
 import com.viraltubesolutions.viraltubeapp.utils.ProgressRequestBody;
 import com.viraltubesolutions.viraltubeapp.utils.ViralTubeUtils;
@@ -63,6 +77,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.jzvd.JZVideoPlayer;
 import dmax.dialog.SpotsDialog;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -77,19 +92,19 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         UploadDialogFragment.uploadDialogInterface,ProgressRequestBody.UploadCallbacks {
 
     RecyclerView recyclerView;
+   static int posi=0;
     LinearLayout novideosLayout;
     FloatingActionButton fab;
     public LevelOneAdapter levelOneAdapter;
-    private static final int REQUEST_VIDEO_CAPTURE = 1,REQUEST_STORAGE_PERMISSION=2;
+    private static final int REQUEST_CAMERA_PERMISSION = 1,REQUEST_CONTACTS=3,REQUEST_VIDEO_CAPTURE=100;
     SwipeRefreshLayout refreshPage;
     VideoView mVideoView;
     View view;
-    String filePath,videoTitle,compressedPath,optionalTag;
+    String filePath,videoTitle,compressedPath,optionalTag,mergedFilePath;
     Context context;
-    ProgressDialog progressDialog;
     NotificationManager notificationManager;
     NotificationCompat.Builder builder;
-    String userID,refreshedToken;
+    static String userID,refreshedToken;
     int votes;
     List<Datum> searchingList;
     SpotsDialog dialog;
@@ -97,11 +112,23 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
     Button mVotes;
     MenuItem refresh;
     private boolean _hasLoadedOnce= false;
+    private FFmpeg ffmpeg;
+    private ProgressDialog progressDialog;
+    private static final String TAG = "VideoMerging";
+    private int choice = 0;
 
-    private boolean isCameraPermissionGranted = false,isStoragePermissionGranted = false;;
+    private boolean isCameraPermissionGranted = false,isStoragePermissionGranted = false,isContactsPermission=false;;
     private boolean loading = true;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
     LinearLayoutManager mLayoutManager;
+    ProgressBar pb;
+    int page=1;
+    private int mLoadedItems = 0;
+    boolean visisble =false;
+    LevelOneFragment level1Fragment;
+    SpotsDialog sd;
+    List<VideoData1> videoInfoList = new ArrayList<>();
+    int a=5000;
 
     @Override
     public void onAttach(Context context) {
@@ -117,11 +144,21 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         this.view = inflater.inflate(R.layout.fragment_level_one, container, false);
         init();
         //hasOptionsMenu();
+        level1Fragment=new LevelOneFragment();
         return view;
     }
 
-    private void init() {
-        checkPermissionForStorage();
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        checkPermissionsForContacts();
+    }
+
+    private void init()
+    {
+
+        //checkPermissionForStorage();
+        loadFFMpegBinary();
         SharedPreferences preferences = context.getSharedPreferences("LogIn", MODE_PRIVATE);
         userID=preferences.getString("userID",null);
 
@@ -138,10 +175,12 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         recyclerView.setLayoutManager(mLayoutManager);
         searchingList=new ArrayList<>();
         novideosLayout=view.findViewById(R.id.nomatch_layout);
+        pb= (ProgressBar) view.findViewById(R.id.fl1_progress_bar);
 
 
         progressDialog=new ProgressDialog(context);
         notificationManager=(NotificationManager)getActivity().getSystemService( getActivity().NOTIFICATION_SERVICE );
+        builder = new NotificationCompat.Builder(context);
 
         fab = (FloatingActionButton) view.findViewById(R.id.fab_level1);
         mVideoView=view.findViewById(R.id.video_view);
@@ -149,45 +188,113 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
 
         refreshPage=view.findViewById(R.id.swipeRefreshLayout);
         refreshPage.setOnRefreshListener(this);
-       /* recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
-                if(dy > 0) //check for scroll down
-                {
-                    visibleItemCount = mLayoutManager.getChildCount();
-                    totalItemCount = mLayoutManager.getItemCount();
-                    pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
-                    if (loading)
-                    {
-                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
-                        {
-                            loading = false;
-                            Log.v("...", "Last Item Wow !");
-                            //Do pagination.. i.e. fetch new data
-                        }
-                    }
-                }
+        loadData(page);
+
+        recyclerView.setOnScrollListener(new EndlessRecyclerOnScrollListener() {
+            @Override
+            public void onLoadMore() {
+
+                loadMoreData();
+
             }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                //JZVideoPlayer.releaseAllVideos();
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy>90)
+                JZVideoPlayer.releaseAllVideos();
+            }
+
         });
-*/
-        CallGetVideosAPI();
+       /* recyclerView.addOnScrollListener(new PaginationScrollListener(mLayoutManager) {
+            @Override
+            protected void loadMoreItems() {
+
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return 0;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return false;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return false;
+            }
+        });*/
+
+
+        //CallGetVideosAPI();
         //callgetOriginalVideosAPI();
     }
-    @Override
+
+  /*  @Override
     public void setUserVisibleHint(boolean isFragmentVisible_) {
         super.setUserVisibleHint(true);
         if (this.isVisible()) {
             if (isFragmentVisible_ && !_hasLoadedOnce) {
                 _hasLoadedOnce = true;
                 //  getContacts1();
-                CallGetVideosAPI();
+               // CallGetVideosAPI();
 
             }
             _hasLoadedOnce = false;
         }
+    }*/
+
+    private void loadMoreData() {
+        page++;
+
+        if(visisble)
+        {
+            pb.setVisibility(View.VISIBLE);
+        }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i <= 9; i++) {
+                    if (mLoadedItems >= searchingList.size()) {
+                        break;
+                    } else {
+                        mLoadedItems++;
+                    }
+                }
+                //levelOneAdapter.notifyDataSetChanged();
+                visisble=true;
+                pb.setVisibility(View.GONE);
+                if(page<4 && mLoadedItems-5<posi)
+                {
+                    loadData(page);
+                }
+                if(level1Fragment.isAdded()) {
+                    SharedPreferences pref = context.getSharedPreferences("Level", 0);
+                    String level = pref.getString("level", null);
+                    Log.d("Level", level + "  ");
+                    if (level != null && level == "level") {
+                        Log.d("Level", level + "  ");
+                        SharedPreferences pref1 = context.getSharedPreferences("Level", 0);
+                        SharedPreferences.Editor editor = pref1.edit();
+                        editor.clear();
+                        editor.commit();
+                        HomePageActivity.changePage();
+                    }
+                }
+            }
+        }, a);
+        a=3000;
     }
     private void callUpdateFCMAPI()
     {
@@ -209,10 +316,38 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
             dialog.show();
 
             WebServices<UploadedVideosResponse> response=new WebServices<UploadedVideosResponse>(LevelOneFragment.this);
-            response.getVideos(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.Getvideos,userID);
+            response.getVideos(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.Getvideos,userID, 1);
         } else {
            // Toast.makeText(context, ""+R.string.err_msg_nointernet, Toast.LENGTH_SHORT).show();
            Snackbar.make(fab, R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+    private void loadData(int limit) {
+        if (ViralTubeUtils.isConnectingToInternet(context)) {
+            dialog=new SpotsDialog(context,"Loading your Videos please wait...");
+            dialog.setCancelable(false);
+            dialog.show();
+
+            WebServices<UploadedVideosResponse> response=new WebServices<UploadedVideosResponse>(LevelOneFragment.this);
+            response.getVideos(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.Getvideos,userID,limit);
+        }
+        else
+        {
+            Snackbar.make(fab, R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
+            Log.d("Level1","Here1");
+        }
+    }
+
+    private void checkVideoUploadLimit() {
+
+
+        if (ViralTubeUtils.isConnectingToInternet(context)) {
+
+            WebServices<UploadLimitCheck> response=new WebServices<UploadLimitCheck>(LevelOneFragment.this);
+            response.checkUploadLimit(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.videoUploadLimit,userID);
+        } else {
+            // Toast.makeText(context, ""+R.string.err_msg_nointernet, Toast.LENGTH_SHORT).show();
+            Snackbar.make(fab, R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -230,9 +365,11 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         }
     }
 
-    public void callSelfUploadAPI() {
-        compressedPath= MediaController.cachedFile.getPath(); // will give string path;
-        File compressedFile=new File(compressedPath);
+    public void callSelfUploadAPI(String path) {
+        //compressedPath= MediaController.cachedFile.getPath(); // will give string path;
+        //File compressedFile=new File(compressedPath);
+        File compressedFile=new File(path);
+        Log.d("mergedpath",mergedFilePath);
         String uploadtype="self";
 
         RequestBody ftitle=RequestBody.create(MediaType.parse("multipart/form-data"), videoTitle);
@@ -256,7 +393,165 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
     public void senddata(String title,String optionaltag) {
         this.videoTitle=title;
         this.optionalTag=optionaltag;
-        new VideoCompressor().execute();
+        //new VideoCompressor().execute();
+        concatVideoCommand();
+    }
+    /**
+     * Load FFmpeg binary
+     */
+    private void loadFFMpegBinary() {
+        try {
+            if (ffmpeg == null) {
+                Log.d(TAG, "ffmpeg : era nulo");
+                ffmpeg = FFmpeg.getInstance(context);
+            }
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+                @Override
+                public void onFailure() {
+                    showUnsupportedExceptionDialog();
+                }
+
+                @Override
+                public void onSuccess() {
+                    Log.d(TAG, "ffmpeg : correct Loaded");
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+            showUnsupportedExceptionDialog();
+        } catch (Exception e) {
+            Log.d(TAG, "EXception no controlada : " + e);
+        }
+    }
+
+    private void showUnsupportedExceptionDialog() {
+        final AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        builder .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Not Supported")
+                .setMessage("Device Not Supported")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        builder.setCancelable(true);
+                        //dismiss
+                    }
+                })
+                .create()
+                .show();
+
+    }
+
+    private void concatVideoCommand() {
+
+//        String mypath1="/storage/emulated/0/WhatsApp/Media/WhatsApp Video/VID-20171207-WA0002.mp4"; // whatsapp video
+//        String mypath2="/storage/emulated/0/WhatsApp/Media/WhatsApp Video/VID-20171207-WA0000.mp4"; //whatsapp video
+//
+        String viralvideo="/storage/emulated/0/Download/open-1.mp4"; //compressed video
+//        String cameravideo="/storage/78DF-15FB/DCIM/Camera/VID_20170805_200937.mp4";
+
+        File moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+
+        String filePrefix = videoTitle;
+        String fileExtn = ".mp4";
+        File dest = new File(moviesDir, filePrefix + fileExtn);
+        int fileNo = 0;
+        while (dest.exists()) {
+            fileNo++;
+            dest = new File(moviesDir, filePrefix + fileNo + fileExtn);
+        }
+        mergedFilePath = dest.getAbsolutePath();
+
+        String[] complexCommand = new String[]{"-y", "-i", viralvideo, "-i",filePath, "-strict", "experimental", "-filter_complex",
+                "[0:v]scale=640x360,setsar=1:1[v0];[1:v]scale=640x360,setsar=1:1[v1];[v0][0:a][v1][1:a] concat=n=2:v=1:a=1[outv][outa]",
+                "-ab", "48000", "-ac", "2", "-ar", "22050", "-s", "640x360", "-vcodec", "libx264","-crf","27","-q","4","-preset", "ultrafast","-map", "[outv]", "-map", "[outa]", mergedFilePath
+        };
+        execFFmpegBinary(complexCommand);
+
+    }
+    /**
+     * Executing ffmpeg binary
+     */
+    private void execFFmpegBinary(final String[] command) {
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+                @Override
+                public void onFailure(String s) {
+                    Log.d(TAG, "FAILED with output : " + s);
+                }
+
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                public void onSuccess(String s) {
+
+                    callSelfUploadAPI(mergedFilePath);
+                    choice=1;
+                    Log.d(TAG, "SUCCESS with output : " + s);
+
+                    Log.d("finalfile", filePath + "");
+                    Toast.makeText(context, "Successfully concatenated" + filePath, Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onProgress(String s) {
+                    Log.d(TAG, "Started command : ffmpeg " + command);
+                    if (choice == 1)
+                        //progressDialog.setMessage("progress : concatenating  videos  " + s);
+                    Log.d(TAG, "progress : " + s);
+                }
+
+                @Override
+                public void onStart() {
+                    Snackbar.make(recyclerView,"Compressing your video in background",3000).show();
+
+                    builder = new NotificationCompat.Builder(context);
+                    builder.setContentTitle("Compressing  your Video..")
+                            .setContentText(videoTitle+".mp4")
+                            .setSmallIcon(android.R.drawable.stat_sys_upload)
+                            .setProgress(0, 0, true)
+                            .setAutoCancel(false);
+                    try{
+                        notificationManager.notify(0, builder.build());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFinish() {
+                    Log.d(TAG, "Finished command : ffmpeg " + command);
+
+                    //progressDialog.dismiss();
+
+                    Snackbar.make(recyclerView,"Started uploading your video in background",3000).show();
+                    builder = new NotificationCompat.Builder(context);
+                  /*  builder.setContentTitle("Compression done")
+                            .setContentText(mergedFilePath+".mp4")
+                            .setSmallIcon(android.R.drawable.stat_sys_upload)
+                            .setProgress(100,100, true);*/
+                    // Snackbar.make(recyclerView,"Compression successful",Snackbar.LENGTH_SHORT).show();
+                    builder.setContentTitle("Compressed Suceessfully")
+                            .setContentText(mergedFilePath+"")
+                            .setSmallIcon(android.R.drawable.stat_sys_upload_done)
+                            .setProgress(100, 100, false)
+                            .setAutoCancel(false);
+                    try{
+                        notificationManager.notify(0, builder.build());
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.d("after_compression", "Compression successfully!");
+                    Log.d("after_compression", "Compressed File Path" +mergedFilePath);
+
+                }
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            // do nothing for now
+        }
     }
     @Override
     public void onClick(View view) {
@@ -265,13 +560,41 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         if (id == R.id.fab_level1) {
             {
                 checkPermissionsForcamera();
-                if (isCameraPermissionGranted) {
+
+                if (isCameraPermissionGranted && isStoragePermissionGranted) {
                     Log.d("permissionCheck", "granted");
-                    takeVideo();
+                    //takeVideo();
+                    checkVideoUploadLimit();
+                    //callVideoLimitDialog();
                     }
 
             }
         }
+    }
+   private void callVideoLimitDialog()
+    {
+        final AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.userupload_limit_dialog, null);
+        builder.setView(dialogView);
+        final AlertDialog alertDialog = builder.create();
+// show dialog
+        alertDialog.show();
+
+        MyCustomTextView dialogtext=dialogView.findViewById(R.id.vT_uld_text);
+        Button btn=dialogView.findViewById(R.id.vB_uld_ok);
+        dialogtext.setText("The self video upload count per user is limited to 2 videos so be careful while uploading");
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               takeVideo();
+                alertDialog.dismiss();
+            }
+        });
+
+
+        // now set layout to dialog
+
     }
 
     private void takeVideo() {
@@ -281,45 +604,56 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         }
 
     }
-    private void checkPermissionForStorage()
-    {
-        if (ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            isStoragePermissionGranted = false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Log.d("permissionCheck", "marshmellow device");
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_STORAGE_PERMISSION);
 
-            }
-        }
-        else{
-            isStoragePermissionGranted=true;
-        }
-
-    }
 
     private void checkPermissionsForcamera() {
         if (ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(context,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED)
         {
             isCameraPermissionGranted = false;
+            isStoragePermissionGranted = false;
 
                 Log.d("permissionCheck", "permissions not granted");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 {
                     Log.d("permissionCheck", "marshmellow device");
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_VIDEO_CAPTURE);
+                    requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
 
                 }
                 else{
                     isCameraPermissionGranted = true;
+                    isStoragePermissionGranted = true;
                 }
         }
        else{
             isCameraPermissionGranted = true;
+            isStoragePermissionGranted = true;
            }
+    }
+
+    private void checkPermissionsForContacts() {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        {
+            isContactsPermission = false;
+
+            Log.d("permissionCheck", "permissions not granted");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                Log.d("permissionCheck", "marshmellow device");
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CONTACTS);
+
+            }
+            else{
+                isContactsPermission = true;
+            }
+        }
+        else{
+            isContactsPermission = true;
+        }
     }
 
 
@@ -357,32 +691,37 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_VIDEO_CAPTURE) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if ((permissions[0].equals(Manifest.permission.CAMERA)
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) &&
+                    (permissions[1].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
                 isCameraPermissionGranted = true;
-                takeVideo();
+                isStoragePermissionGranted=true;
+
+
+                checkVideoUploadLimit();
+                //takeVideo();
 
             } else {
 
                 Toast.makeText(context, "you dont have permission to access camera features", Toast.LENGTH_SHORT).show();
             }
         }
-        else if(requestCode == REQUEST_STORAGE_PERMISSION) {
-                if((permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED))
-                {
-                    isStoragePermissionGranted=true;
-                }
-                else
-                {
+        else if (requestCode == REQUEST_CONTACTS) {
+            if ((permissions[0].equals(Manifest.permission.READ_CONTACTS)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                isContactsPermission = true;
+                init();
+            } else {
 
-                    Toast.makeText(context, "you dont have permission for Storage", Toast.LENGTH_SHORT).show();
-                }
-
+                Toast.makeText(context, "you dont have permission for Storage", Toast.LENGTH_SHORT).show();
             }
 
-         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 //to get swipe refreshing of page
     @Override
@@ -398,7 +737,9 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                CallGetVideosAPI();
+                int page1=1;
+               // CallGetVideosAPI();
+                loadData(page1);
                 //callgetOriginalVideosAPI();
                 //refreshPage.setBackgroundColor(getResources().getColor(R.color.gray));
                 refreshPage.setRefreshing(false);
@@ -456,10 +797,45 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public void onResponse(Object response, WebServices.ApiType URL, boolean isSucces) {
         switch (URL)
         {
+            case Getvideos:
+                if(dialog.isShowing())
+                {
+                    dialog.dismiss();
+                }
+                if (isSucces) {
+                    UploadedVideosResponse details = (UploadedVideosResponse) response;
+                    novideosLayout.setVisibility(View.GONE);
+                    if(details.getRESPONSECODE().equalsIgnoreCase("200")) {
+                        if(refreshPage.isRefreshing()) {
+                            refreshPage.setRefreshing(false);
+                        }
+                        if (details.getData() != null) {
+                            page++;
+                            searchingList=details.getData();
+
+                            levelOneAdapter = new LevelOneAdapter(context,searchingList,recyclerView,userID,
+                                    LevelOneFragment.this,refreshedToken,novideosLayout);
+                            recyclerView.setAdapter(levelOneAdapter);
+                            loadMoreData();
+                            levelOneAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else {
+                        novideosLayout.setVisibility(View.VISIBLE);
+                        Snackbar.make(recyclerView,"Failed to get videos", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    novideosLayout.setVisibility(View.VISIBLE);
+                    Snackbar.make(recyclerView,"Failed to get videos", Snackbar.LENGTH_SHORT).show();
+                }
+                break;
             /*case getOriginalVideos:
                 if(dialog.isShowing())
                 {
@@ -478,7 +854,7 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
                 }
                 break;*/
 
-                case Getvideos:
+                /*case Getvideos:
                 if(dialog.isShowing())
                 {
                     dialog.dismiss();
@@ -508,6 +884,21 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
                     novideosLayout.setVisibility(View.VISIBLE);
                     Snackbar.make(recyclerView,"Failed to get videos", Snackbar.LENGTH_SHORT).show();
                 }
+                break;*/
+
+            case videoUploadLimit:
+                UploadLimitCheck check= (UploadLimitCheck) response;
+                String vid_limit=check.getVideoLimit();
+                int vid_count=check.getUserVideoCount();
+                String responseCode=check.getRESPONSECODE();
+                if(responseCode.equalsIgnoreCase("200") && vid_count <= Integer.parseInt(vid_limit))
+                {
+                    callVideoLimitDialog();
+                }
+                else {
+                    callLimitExceedsDialog();
+
+                }
                 break;
             case selfuploadVideo:
                 SelfUploadResponse selfUpload= (SelfUploadResponse) response;
@@ -515,13 +906,9 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
                     if (selfUpload.getRESPONSECODE().equalsIgnoreCase("200")) {
 
                         Snackbar.make(fab, videoTitle+".mp4 Uploaded successfully", Snackbar.LENGTH_SHORT).show();
-                        if(progressDialog.isShowing())
-                        {
-                            progressDialog.setProgress(100);
-                            progressDialog.dismiss();
-                            Snackbar.make(fab, "Uploaded successfully", Snackbar.LENGTH_SHORT).show();
-                        }
+
                     }
+
                 }
                 break;
             case updateFCMKey:
@@ -534,19 +921,30 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
                     }
                 }
                 break;
-            case getvotes:
-                NumOfVotesResponse votesResponse= (NumOfVotesResponse) response;
-                if(isSucces) {
-                    if (votesResponse.getRESPONSECODE().equalsIgnoreCase("200")) {
-                        votes++;
-                        mVotes.setBackgroundResource(R.drawable.heart_shape_blued);
-
-                    }
-
-
-                }
 
         }
+    }
+    void callLimitExceedsDialog()
+    {
+        final AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.userupload_limit_dialog, null);
+        builder.setView(dialogView);
+        final AlertDialog alertDialog = builder.create();
+// show dialog
+        alertDialog.show();
+
+        MyCustomTextView dialogtext=dialogView.findViewById(R.id.vT_uld_text);
+        Button btn=dialogView.findViewById(R.id.vB_uld_ok);
+        dialogtext.setText("You have exceeded your limit to upload self video");
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+
     }
 
     public static String getFilePath(Context context, Uri uri) throws URISyntaxException {
@@ -666,6 +1064,10 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
         fragment.setCancelable(false);
     }
 
+    public static void getAdapterPosition(int position) {
+        posi=position;
+    }
+
 
     public class VideoCompressor extends AsyncTask<Void, Void, Boolean> {
         @Override
@@ -678,7 +1080,7 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
             compressionDialog.setIndeterminate(false);
             compressionDialog.show();*/
             Snackbar.make(recyclerView,"Compressing your video in background", Snackbar.LENGTH_SHORT).show();
-            notificationManager=(NotificationManager)getActivity().getSystemService( getActivity().NOTIFICATION_SERVICE );
+
             builder = new NotificationCompat.Builder(context);
             builder.setContentTitle("Compressing  your Video..")
                     .setContentText(videoTitle+".mp4")
@@ -703,15 +1105,14 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
             super.onPostExecute(compressed);
             if (compressed) {
                 //compressionDialog.dismiss();
-                notificationManager=(NotificationManager)getActivity().getSystemService( getActivity().NOTIFICATION_SERVICE );
                 builder = new NotificationCompat.Builder(context);
                 builder.setContentTitle("Compression done")
                         .setContentText(compressedPath+".mp4")
-                        .setSmallIcon(android.R.drawable.stat_sys_upload)
+                        .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                         .setProgress(100,100, true);
                // Snackbar.make(recyclerView,"Compression successful",Snackbar.LENGTH_SHORT).show();
                 builder.setContentTitle(videoTitle+".MP4 Compressed Suceessfully")
-                        .setSmallIcon(android.R.drawable.stat_sys_upload)
+                        .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                         .setProgress(100, 100, false)
                         .setAutoCancel(false);
                 try{
@@ -720,7 +1121,7 @@ public class LevelOneFragment extends Fragment implements View.OnClickListener,O
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                callSelfUploadAPI();
+                callSelfUploadAPI(filePath);
                 Log.d("after_compression", "Compression successfully!");
                 Log.d("after_compression", "Compressed File Path" + MediaController.cachedFile.getPath());
 

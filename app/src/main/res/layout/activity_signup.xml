@@ -54,7 +54,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/signup_username_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -81,7 +80,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/signup_email_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -108,7 +106,6 @@
 
 
             <LinearLayout
-                android:id="@+id/signup_phonenumber_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -137,7 +134,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/signup_password_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -168,7 +164,6 @@
 
 
             <LinearLayout
-                android:id="@+id/signup_gender_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -193,7 +188,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/signup_age_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -221,36 +215,7 @@
             </LinearLayout>
 
 
-            <RadioGroup
-                android:id="@+id/signup_radiogroup_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginTop="20dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                >
-
-                <RadioButton
-                    android:textColorHighlight="@color/colorPrimary"
-                    android:id="@+id/vR_as_individual"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:text="@string/radio_individual"
-                    />
-
-                <RadioButton
-                    android:id="@+id/vR_as_college"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_marginLeft="80dp"
-                    android:text="@string/radio_college" />
-            </RadioGroup>
-
-
             <LinearLayout
-                android:id="@+id/signup_location_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -279,7 +244,6 @@
 
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/signup_termsandconditions_layout"
                 android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,5 +1,6 @@
 package com.viraltubesolutions.viraltubeapp.adapters;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ public class Tab4adapter extends RecyclerView.Adapter<Tab4adapter.MyHolder> impl
     RecyclerView recyclerView;
     String muserID,mVideoid;
     LinearLayout nomatchLayout;
+    ProgressDialog pd;
 
     public Tab4adapter(Context context, List<Contact> contactList, RecyclerView mRecyclerView, String userID, LinearLayout nomatchLayout) {
         this.contactList = contactList;
@@ -54,7 +56,7 @@ public class Tab4adapter extends RecyclerView.Adapter<Tab4adapter.MyHolder> impl
         this.recyclerView=mRecyclerView;
         this.muserID=userID;
         this.nomatchLayout=nomatchLayout;
-
+        pd=new ProgressDialog(context);
     }
     @Override
     public Filter getFilter() {
@@ -121,18 +123,25 @@ public class Tab4adapter extends RecyclerView.Adapter<Tab4adapter.MyHolder> impl
             mobileNumber =(TextView)view.findViewById(R.id.contact_number);
             view.setOnClickListener(this);
 
-            SharedPreferences videoid=context.getSharedPreferences("VideoIDPreference",Context.MODE_PRIVATE);
-            mVideoid=videoid.getString("videoID",null);
+
         }
 
         @Override
         public void onClick(View v) {
-
-            if(mVideoid!=null){
-                callSendAPI(getAdapterPosition());
             SharedPreferences videoid=context.getSharedPreferences("VideoIDPreference",Context.MODE_PRIVATE);
-            videoid.edit().clear().apply();
+            mVideoid=videoid.getString("videoID",null);
+            if(mVideoid!=null){
+                pd.setMessage("Please Wait");
+                pd.show();
+                callSendAPI(getAdapterPosition());
+            SharedPreferences videoid1=context.getSharedPreferences("VideoIDPreference",Context.MODE_PRIVATE);
+            videoid1.edit().clear().apply();
             mVideoid=null;
+            }
+            else
+            {
+                Snackbar.make(recyclerView,"Please select a video to share", Snackbar.LENGTH_SHORT).show();
+
             }
 
 
@@ -145,11 +154,15 @@ public class Tab4adapter extends RecyclerView.Adapter<Tab4adapter.MyHolder> impl
                     .build();
             ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-            Call<ShareResponse> call = viralTubeAPI.share(mVideoid,muserID);
+            Call<ShareResponse> call = viralTubeAPI.share(mVideoid,contactList.get(position).getId());
             call.enqueue(new Callback<ShareResponse>() {
                 @Override
                 public void onResponse(Call<ShareResponse> call, Response<ShareResponse> response) {
                     if (response.body().getRESPONSECODE().equalsIgnoreCase("200")) {
+                        if(pd.isShowing())
+                        {
+                            pd.dismiss();
+                        }
 
                        /* ArrayList<ShareResponse> share=new ArrayList<>();
                         share.add(new ShareResponse(response.body().getId(),response.body().getTitle(),response.body().getThumbnailUrl(),response.body().getVideoUrl(),
@@ -172,7 +185,11 @@ public class Tab4adapter extends RecyclerView.Adapter<Tab4adapter.MyHolder> impl
                         editor1.apply();
 
                     } else if (response.body().getRESPONSECODE().equalsIgnoreCase("403")) {
-                        Snackbar.make(recyclerView,"Database error", Snackbar.LENGTH_SHORT).show();
+                        if(pd.isShowing())
+                        {
+                            pd.dismiss();
+                        }
+                        Snackbar.make(recyclerView,"The user is currently not using ViralTube app", Snackbar.LENGTH_SHORT).show();
                     }
                     else if (response.body().getRESPONSECODE().equalsIgnoreCase("409")) {
                         Snackbar.make(recyclerView,"Please select a video to send", Snackbar.LENGTH_SHORT).show();

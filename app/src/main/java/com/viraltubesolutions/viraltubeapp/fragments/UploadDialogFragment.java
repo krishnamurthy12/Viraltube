@@ -35,7 +35,7 @@ public class UploadDialogFragment extends DialogFragment implements View.OnClick
         mVideotitle = baseView.findViewById(R.id.vE_fud_title);
         mUpload = baseView.findViewById(R.id.vB_fud_upload);
         mCancel = baseView.findViewById(R.id.vB_fud_cancel);
-        mVideotitle = baseView.findViewById(R.id.vE_fud_title);
+        //mVideotitle = baseView.findViewById(R.id.vE_fud_title);
         mOptionaltag=baseView.findViewById(R.id.vE_fud_tag);
 
         AssetManager assetManager = getActivity().getAssets();

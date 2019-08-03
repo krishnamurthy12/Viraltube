@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Viral Tube</string>
-    <string name="map_api_key">AIzaSyDnr5G7rmBlEzddB0cc1I2TTVl1mrV1YGw</string>
+    <string name="action_settings">Settings</string>
 
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
@@ -14,10 +14,8 @@
     <string name="hint_email">E-mail</string>
     <string name="hint_password">Password</string>
     <string name="hint_phone_number">Phone Number</string>
-    <string name="hint_gender">Select Gender</string>
     <string name="hint_age">Age</string>
     <string name="hint_location">Location</string>
-    <string name="hint_email_id">Email id</string>
     <string name="radio_individual">Individual</string>
     <string name="radio_college">College</string>
     <string name="terms_and_conditions">Terms and conditions</string>
@@ -33,22 +31,9 @@
     <string name="err_msg_termsandconditions">Please accept the terms and conditions</string>
     <string name="err_msg_nointernet">Please check your internet connection</string>
 
-    <string name="tab1">Level1</string>
-    <string name="tab2">Uploads</string>
-    <string name="tab3">Level1</string>
-    <string name="tab4">Contacts</string>
-
-    <string name="nav_home">Home</string>
-    <string name="nav_events">Events</string>
-    <string name="nav_aboutus">About us</string>
-    <string name="nav_rateus">Rate us</string>
-    <string name="nav_feedback">Feed back</string>
-    <string name="nav_callus">Call us</string>
-    <string name="nav_logout">Logout</string>
     <string name="contact">contact</string>
     <string name="share">share</string>
     <string name="promote">promote</string>
-    <string name="hint_tagoptional">Tag(Optional)</string>
 
     <string-array name="ContactNames">
         <item>Krishna murthy</item>
@@ -74,15 +59,11 @@
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="level2">Level2</string>
     <string name="text_viral">Viral</string>
     <string name="text_tube"> Tube</string>
     <string name="show_password">Show Password</string>
     <string name="dont_have_an_account_yet">Dont have an account yet?</string>
     <string name="err_msg_gender">Please select a gender</string>
-    <string name="views">Views</string>
-    <string name="votes">Votes</string>
     <string name="video_name">Video name</string>
     <string name="tag_optional">Tag (optional)</string>
     <string name="name">Name</string>
@@ -111,30 +92,125 @@
     <string name="sorry_no_videos_found_at_this_moment">Sorry no Videos Found at this Moment</string>
 
     <!--String resources for atom payment gateway-->
-
-    <string-array name="paymentOption">
-        <item>Select Payment Option</item>
-        <item>Net Banking</item>
-        <item>IMPS</item>
-        <!--  <item>Wallet</item>  -->
-    </string-array>
+    <string name="Rs">\u20B9</string>
+    <string name="_610">610</string>
+    <string name="votes"> Votes</string>
+    <string name="views"> Views</string>
+    <string name="refresh">refresh</string>
+    <string name="search">search</string>
 
     <string-array name="bank">
         <item>Select Bank</item>
-        <item>Atom Bank</item>
+        <item>"Bank of Baroda"</item>
+        <item>"Bank of Baroda Retail"</item>
+        <item>"Bank of India"</item>
+        <item>"Bank of Maharashtra"</item>
+        <item>"Canara Bank NetBanking"</item>
+        <item>"Catholic Syrian Bank"</item>
+        <item>"Central Bank of India"</item>
+        <item>"Corporation Bank"</item>
+        <item>"DBS Bank Ltd"</item>
+        <item>"DCB BANK Business"</item>
+        <item>"DCB BANK Personal"</item>
+        <item>"Deutsche Bank"</item>
+        <item>"Dhanlaxmi Bank"</item>
+        <item>"Fedral Bank"</item>
+        <item>"IDBI Bank"</item>
+        <item>"Indian Bank"</item>
+        <item>"Indian Overseas Bank"</item>
+        <item>"Indusind Bank"</item>
+        <item>"Jammu and Kashmir Bank"</item>
+        <item>"Karnataka Bank"</item>
+        <item>"Karur Vysya Bank"</item>
+        <item>"Lakshmi Vilas Bank NetBanking"</item>
+        <item>"ORIENTAL BANK OF COMMERCE"</item>
+        <item>"Punjab &amp; Sind Bank"</item>
+        <item>"Punjab National Bank"</item>
+        <item>"Punjab National Bank"</item>
+        <item>"Royal Bank Of Scotland"</item>
+        <item>"SaraSwat Bank"</item>
+        <item>"South Indian Bank"</item>
+        <item>"Standard Chartered Bank"</item>
+        <item>"Tamilnad Mercantile Bank"</item>
+        <item>"UCO Bank"</item>
+        <item>"Union Bank"</item>
+        <item>"United Bank of India"</item>
+    </string-array>
+    <string-array name="bank_code">
+        <item>"0"</item>
+        <item>"1045"</item>
+        <item>"1046"</item>
+        <item>"1012"</item>
+        <item>"1033"</item>
+        <item>"1030"</item>
+        <item>"1031"</item>
+        <item>"1028"</item>
+        <item>"1004"</item>
+        <item>"1047"</item>
+        <item>"1042"</item>
+        <item>"1027"</item>
+        <item>"1024"</item>
+        <item>"1038"</item>
+        <item>"1019"</item>
+        <item>"1007"</item>
+        <item>"1026"</item>
+        <item>"1029"</item>
+        <item>"1015"</item>
+        <item>"1001"</item>
+        <item>"1008"</item>
+        <item>"1018"</item>
+        <item>"1009"</item>
+        <item>"1035"</item>
+        <item>"1055"</item>
+        <item>"1048"</item>
+        <item>"1049"</item>
+        <item>"1050"</item>
+        <item>"1053"</item>
+        <item>"1022"</item>
+        <item>"1051"</item>
+        <item>"1044"</item>
+        <item>"1057"</item>
+        <item>"1016"</item>
+        <item>"1041"</item>
+        <item>"1039"</item>
+        <item>"1005"</item>
     </string-array>
 
-    <string-array name="paymentMode">
-        <item>Select Payment Mode</item>
-        <item>Credit Card</item>
-        <item>Debit Card</item>
-    </string-array>
-    <string-array name="cardAssociate">
-        <item>Select Card Type</item>
-        <item>Maestro</item>
-        <item>Master</item>
-        <item>Rupay</item>
-        <item>VISA</item>
-    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="filter">filter</string>
+    <string name="todo">TODO</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="update">Update</string>
+    <string name="ok">OK</string>
+    <string name="password_sent">SMS has been sent to your registered Mobile number which will allow you to reset your password. Please check your SMS</string>
+    <string name="change_password">Change Password</string>
+    <string name="skip">Skip>></string>
+    <string name="received_password">Received Password</string>
+
+    <string name="about_us_general_business">ViralTube, a Mobile Application based company is established in the IT Headquarter of India. Thinking beyond the conventional ways of what can be perpetrated with video sharing and advertising revenue,Our model whirls around this traditional business model. Thereby, we intend to earmark this vision of company in reaching the mass of entire India, its people and its youth in getting ahead with the mind blogging multifariousness of the company.</string>
+    <string name="about_us_purpose">To attain leadership and set a benchmark for video sharing and advertisement revenue generating application on the ever booming android field of technology by inculcation within the app intensified services and desired profits.</string>
+    <string name="about_us_vision">ViralTube envisions a rostrum for present youth and the people where everyone is set glued to their smart phones on which information flows through the tip of fingers through various applications. Your valuable time on our application stands out to be the best with our services that are bound to influence our users to the greatest extent and a whole new awesome experience.</string>
+    <string name="about_us_missinstatement">To act with decorum and deliver as promised, build a never ending alliance with our application users and also the clients. Pledge to provide unmatched quality experience by carrying business in the most innovative method in sync with the upmarket technology.</string>
+    <string name="about_us_goals">An epidemic augmentation into the sphere of video content sharing and overshadow the entire Indian market of various video sharing platforms. Henceforth, inventing the best foundation for its key users. Invariably skyrocket the number of users and the investment towards the company in achieving utmost support towards the various services development. To befit as a key player in the video content sharing and advertisement revenue generation industry.</string>
+    <string name="about_us_corevalues">We trust in handling our application users with esteem obeisance. Inculcating our other core values such s innovation, trend changing ideas, market revolutionary plans. All of these incorporated with uplift creativity and inventions. At ViralTube the jeans run with the best of morality, rectitude, solidarity,unification and ethical functioning of our business.</string>
+    <string name="about_app">First time ever in the history of Karnataka!! Multi-talent REALITY SHOW on the app. Viral tube is a voting based reality show app to provide an opportunity to people from all walks of life to showcase their talent and rise to fame. It is a true celebration of the youthful spirit, that features stellar performances of singers, dancers, theatre artists, beatboxers, musicians, comedians, magicians, and many more talents, all vying for their chance to win the entry to the golden stage and become a real celebrity. To sign up as a participant, download the app and provide basic info about your self to receive more information via email. Viewers, ﬁnd exclusive content of never-seen-before performances and receive updates about your favourite contestants. </string>
+    <string name="how_app_works"><b>Level 1 :</b>Introduce yourself about your interests and answer - why do yo want to participate in this reality show?
+        \n • Perform with a live camera on any activity that you are passionate about. Activities can include but not limited to only singing, dancing, mimicry, dubsmash, spoof, rampwalk, bodyshows, acting, beatboxing, gymnastics, comedy, playing - guitar, ﬂute etc.,
+        \n • Upload your live recording or any of your past/present projects on our app. Public watches your video and if they like, they will vote for you. If you get 100 likes, you will be enter level 2. Hurray!!
+    \n \n<b>Level 2 :</b> There will be few tasks that you can choose based on your activity of interest.
+        \n • Pick one task and record your live performance and upload on the app. Here is a small twist! Only top voted performers will proceed to level 3.
+        \n \n<b>Level 3:</b> This level decides your destiny.
+        \n • You will combat with the performer who has chosen the same task in level 2 and with same number votes.
+        \n • The performer with highest votes in stipulated time will be the winner. This unveils the curtain for you to the golden stage. That sounds exciting and challenging, isn’t it?!! By participating in this online audition and submitting an online audition video for consideration by Viral Tube producers and viewers, your performance/task acknowledges that you read, understand and voluntarily agree to abide by these Online Audition and Video Submission Terms and Conditions. The effective date of these Terms and Conditions shall be the date on which you submit your Audition Video in the ‘Level 1’, as described above. </string>
+    <string name="terms_a_er">1. The performance includes a participant who performs alone. \n \n  2. Any participant who is under the age of eighteen on the date of submission must have his or her parent or legal guardian’s permission to participate in the Online Audition. \n \n 3. Producer reserves the right to remove any participant/person from the Program who is sufﬁciently connected with the Program or Producer, subsidiaries or afﬁliated companies, or any other person or entity connected with the production, administration, any television station or channel, cable network, or satellite network that may air or otherwise exhibit the Program or any variation thereof; any person or entity involved in the development, production, distribution, or other exploitation of the Program or any variation thereof, producer determines that such person’s involvement in the Program does not and will not affect the integrity of the Program</string>
+    <string name="terms_b_ar"> • The participant must submit ONLY ONE Audition Video of their interested task.
+    \n \n • Audition Videos should be submitted only on the Viral Tube APP. Audition Videos will NOT be accepted after 11:59 p.m. on the close of the Video Submission Period .\n \n  • Participant (or the parent or legal guardian of a participant that is a minor in his or her state of residence) must have Internet access during the Video Submission Period, and sign up on Online Audition APP.\n \n • Viral Tube is NOT responsible for any physical damage or public damage (if the task is a prank-related or street performance etc.,)of the participants during their performances in any of the levels. </string>
+    <string name="audition_content">• Video should be not be greater than 3–4 minutes. It may include a short introduction (not more than 30 seconds) stating the name of the performance, and any other information the performer would like to convey. \n \n • Audition Videos must NOT contain material which is sexually explicit, obscene, pornographic, violent (for example, relating to murder, weapons, cruelty, abuse, etc.), discriminatory (based on race, sex, religion, national origin, physical disability, sexual orientation or age), illegal (for example, underage drinking, substance abuse, computer hacking, etc.), offensive, threatening, profane or harassing. </string>
+    <string name="judging">• Audition Videos submitted for consideration in this Online Audition will be judged by the public who installed ViralTube app. </string>
+    <string name="disqualification">• Producer reserves the right to disqualify and/or exclude, in its sole and absolute discretion, any individual from the audition process for any reason or for no reason at all, including without limitation, violation of any portion of these Terms and Conditions, or tampering with the entry process or the audition process.</string>
+    <string name="payment_terms">• There are no charges to submit performance for Level 1 auditions.\n \n • Once the participant wins 100 votes, he/she needs to pay the entry charges for level 2 i.e.,Rs.630 only.\n \n • This will be online payment and non-refundable. Transfers to other individuals will NOT be entertained.\n \n ELIGIBLE PARTICIPANTS MUST SUBMIT THE AUDITION VIDEO IN ACCORDANCE WITH THESE TERMS AND CONDITIONS.\n \n We look forward to share this enthralling journey with you!</string>
+
 
 </resources>

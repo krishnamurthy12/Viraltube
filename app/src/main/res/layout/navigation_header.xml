@@ -1,31 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/nav_header_height"
-        android:background="@color/dark_gray"
-        android:orientation="vertical"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        android:paddingBottom="@dimen/nav_header_icon_padding"
-        android:paddingLeft="@dimen/nav_header_icon_padding"
-        android:paddingRight="@dimen/nav_header_icon_padding"
-        android:paddingTop="@dimen/nav_header_icon_padding"
-        android:gravity="center"
-        >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="230dp"
+    android:background="@color/dark_gray"
+    android:orientation="vertical"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:paddingBottom="@dimen/nav_header_icon_padding"
+    android:paddingLeft="@dimen/nav_header_icon_padding"
+    android:paddingRight="@dimen/nav_header_icon_padding"
+    android:paddingTop="@dimen/nav_header_icon_padding"
+    android:gravity="center"
+    >
 
-        <ImageView
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-            android:id="@+id/imageView"
-            android:layout_width="135dp"
-            android:layout_height="135dp"
+        <com.viraltubesolutions.viraltubeapp.customs.CircleImageView
+            android:id="@+id/vI_nh_userpic"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:src="@drawable/user_icon"
-            app:srcCompat="@drawable/user_icon"
+            android:paddingBottom="16dp"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp"/>
+            android:src="@drawable/user_icon"
+            app:civ_border_width="1dp" />
 
-    </LinearLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/vF_nh_upload"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/fab_margin"
+            android:scaleType="center"
+            android:src="@drawable/edit" />
 
+
+    </FrameLayout>
+
+    <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/vT_nh_username"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_view_size_large"/>
+    <ProgressBar
+        android:id="@+id/vP_nh_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:max="500"
+        android:progress="0"
+        android:progressDrawable="@drawable/circularprogressbar"
+        android:visibility="gone"/>
+
+</LinearLayout>

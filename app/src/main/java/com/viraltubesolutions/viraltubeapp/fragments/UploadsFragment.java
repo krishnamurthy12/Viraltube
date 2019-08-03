@@ -1,11 +1,13 @@
 package com.viraltubesolutions.viraltubeapp.fragments;
 
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,7 +16,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -28,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.viraltubesolutions.videoplayerlibrary.customview.JZVideoPlayerStandard;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.SelfUploadResponse;
 import com.viraltubesolutions.viraltubeapp.R;
 import com.viraltubesolutions.viraltubeapp.customs.CircleImageView;
@@ -42,10 +45,12 @@ import com.viraltubesolutions.viraltubeapp.videocompression.MediaController;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import cn.jzvd.JZVideoPlayerStandard;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
@@ -58,17 +63,17 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
     RelativeLayout layout2;
     CircleImageView mImageThumb;
     MyCustomEditText mvideoTitle,mtag;
-    private static final int SELECT_VIDEO=100;
+    private static final int SELECT_VIDEO=100,REQUEST_STORAGE_PERMISSION=2;
     JZVideoPlayerStandard jzVideoPlayerStandard;
-    String selectedFilePath;
+    String selectedFilePath,compressedPath;
     Context context;
     public String videoTitle;
     public String optionalTag;
     View view;
-    String compressedPath;
     File compressedFile;
     String userID;
-    boolean isUploading=false;
+    boolean isUploading=false,isStoragePermissionGranted = false;
+
 
     NotificationManager notificationManager;
     NotificationCompat.Builder builder;
@@ -114,7 +119,7 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
         {
             JZVideoPlayerStandard jzVideoPlayerStandard = (JZVideoPlayerStandard) view.findViewById(R.id.videoView);
             jzVideoPlayerStandard.setUp("http://viraltube.co.in/viral/Viraltube_Video.mp4"
-                    , JZVideoPlayerStandard.SCREEN_LAYOUT_NORMAL, "");
+                    , JZVideoPlayerStandard.SCREEN_WINDOW_NORMAL, "");
            // jzVideoPlayerStandard.thumbImageView.setImageResource(R.drawable.age);
            // Glide.with(context).load("http://viraltube.co.in/viral/kt_talent.jpeg").into(jzVideoPlayerStandard);
             Glide.with(context)
@@ -130,8 +135,9 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
         }
         private void callUploadFromGalleryAPI()
         {
-            compressedPath= MediaController.cachedFile.getPath(); // will give string path;
-            compressedFile=new File(compressedPath);
+            //compressedPath= MediaController.cachedFile.getPath(); // will give string path;
+            //compressedFile=new File(compressedPath);
+            File compressedFile=new File(selectedFilePath);
             String upload_type="normal";
 
             RequestBody ftitle=RequestBody.create(MediaType.parse("multipart/form-data"), videoTitle);
@@ -151,29 +157,72 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
                 Snackbar.make(mBtnConfirmUpload, R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
             }
         }
+    private void checkPermissionForStorage()
+    {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            isStoragePermissionGranted = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Log.d("permissionCheck", "marshmellow device");
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_STORAGE_PERMISSION);
+
+            }
+            else{
+                isStoragePermissionGranted=true;
+            }
+        }
+        else{
+            isStoragePermissionGranted=true;
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+         if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            if ((permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+               selectVideo();
+
+            } else {
+
+                Toast.makeText(context, "you dont have permission for Storage", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK && requestCode == SELECT_VIDEO) {
             Uri selectedUri = data.getData();
             Glide.with(this).load(selectedUri).into(mImageThumb);
 
-            if (requestCode == SELECT_VIDEO) {
-                try {
-                    selectedFilePath=getFilePath(getContext(),selectedUri);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-                if(selectedFilePath!=null)
-                {
-                    File file=new File(selectedFilePath);
-                    Log.d("beforecompression",""+file.getAbsolutePath());
-                }
-
-
+            try {
+                selectedFilePath = getFilePath(getContext(), selectedUri);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
+            if (selectedFilePath == null) {
+//                Snackbar.make(mBtnConfirmUpload,"Please select a video",Snackbar.LENGTH_SHORT).show();
+//                layout1.setVisibility(View.VISIBLE);
+//                layout2.setVisibility(View.GONE);
+                //File file = new File(selectedFilePath);
+                //Log.d("beforecompression", "" + file.getAbsolutePath());
+            }
+
+
+        }
+        else if(requestCode==SELECT_VIDEO && resultCode==RESULT_CANCELED)
+        {
+            layout2.setVisibility(View.VISIBLE);
+            layout1.setVisibility(View.GONE);
+            //Snackbar.make(mBtnConfirmUpload,"Please select a video",Snackbar.LENGTH_SHORT).show();
         }
 
     }
@@ -184,13 +233,12 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
         {
             case R.id.uploadVideo_Btn:
                 if(!isUploading) {
+                    checkPermissionForStorage();
+                    if(isStoragePermissionGranted)
+                    {
+                        selectVideo();
 
-                    Intent mediaChooser = new Intent(Intent.ACTION_GET_CONTENT);
-                    mediaChooser.setType("video/*");
-                    startActivityForResult(mediaChooser, SELECT_VIDEO);
-
-                    layout1.setVisibility(View.VISIBLE);
-                    layout2.setVisibility(View.GONE);
+                    }
 
                 }
                 else{
@@ -214,14 +262,18 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
                 //Toast.makeText(getActivity(), "uploaded successfully", Toast.LENGTH_SHORT).show();
                 this.videoTitle=mvideoTitle.getText().toString();
                 this.optionalTag=mtag.getText().toString();
-                if(videoTitle.isEmpty())
+                if (selectedFilePath == null) {
+                    Snackbar.make(mBtnConfirmUpload,"Please select a video",Snackbar.LENGTH_SHORT).show();
+                }
+                else if(videoTitle.isEmpty())
                 {
                     Snackbar.make(mBtnUpload,"Plese provide the Video title", Snackbar.LENGTH_SHORT).show();
                     break;
                 }
                 else {
                     isUploading=true;
-                    new VideoCompressor().execute();
+                    //new VideoCompressor().execute();
+                    callUploadFromGalleryAPI();
 
                     layout2.setVisibility(View.VISIBLE);
                     layout1.setVisibility(View.GONE);
@@ -250,10 +302,20 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
         }
 
     }
+    private void selectVideo()
+    {
+        Intent mediaChooser = new Intent(Intent.ACTION_GET_CONTENT);
+        mediaChooser.setType("video/*");
+        startActivityForResult(mediaChooser, SELECT_VIDEO);
+
+        layout1.setVisibility(View.VISIBLE);
+        layout2.setVisibility(View.GONE);
+    }
 
 
     @Override
     public void onProgressUpdate(int percentage) {
+        notificationManager=(NotificationManager)getActivity().getSystemService( getActivity().NOTIFICATION_SERVICE );
         builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Uploading Video..")
                 .setContentText(videoTitle+".mp4")
@@ -300,6 +362,11 @@ public class UploadsFragment extends Fragment implements View.OnClickListener,Pr
                         isUploading=false;
                         Snackbar.make(mBtnConfirmUpload, videoTitle+".mp4 Uploaded successfully", Snackbar.LENGTH_SHORT).show();
                     }
+                }
+                else
+                {
+                    isUploading=false;
+                    Snackbar.make(mBtnConfirmUpload, videoTitle+"Failed to Uploaded your video please try again", Snackbar.LENGTH_SHORT).show();
                 }
                 break;
         }

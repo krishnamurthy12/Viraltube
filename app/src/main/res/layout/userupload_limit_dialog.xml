@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+        android:id="@+id/vT_uld_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_view_size_large"
+        android:textColor="@color/colorPrimary"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_gravity="center"
+        />
+    <Button
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:id="@+id/vB_uld_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/button_paddingLeft"
+        android:paddingRight="@dimen/button_paddingRight"
+        android:text="@string/ok"
+        android:textAllCaps="false"
+        android:textColor="@color/colorwhite"
+        android:textSize="@dimen/button_txt18sp"
+        android:paddingStart="@dimen/button_paddingLeft"
+        android:paddingEnd="@dimen/button_paddingRight" />
+    </LinearLayout>
+
+</RelativeLayout>

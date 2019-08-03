@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.viraltubesolutions.viraltubeapp.activities.AboutUsActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:paddingStart="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_termsnconditions"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorwhite"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:theme="@style/AppTheme.PopupOverlay"
+            app:popupTheme="@style/Theme.AppCompat.Light"
+            app:title="Terms and conditions"
+            app:titleMarginStart="@dimen/margin_small"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:titleTextColor="@color/colorPrimary">
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingRight="@dimen/margin_small"
+                android:paddingLeft="@dimen/margin_small"
+                android:paddingTop="@dimen/margin_small"
+                >
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:text="A. Eligibility Requirements"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:textColor="@color/lightgreen"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/terms_a_er"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingRight="@dimen/margin_small"
+                android:paddingLeft="@dimen/margin_small"
+                android:paddingTop="@dimen/margin_small"
+                >
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:text="B. Audition Video Submission Requirements"
+                    android:gravity="center"
+                    android:textColor="@color/lightgreen"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:textStyle="bold"
+                    android:text="1. General Requirements"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/terms_b_ar"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:textStyle="bold"
+                    android:text="2. Audition Video Content"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/audition_content"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:text="3. Judging"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/judging"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:text="4. Disqualifications"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/disqualification"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_xlarge"
+                    android:text="5. Payment terms"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"/>
+                <com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_view_size_medium"
+                    android:text="@string/payment_terms"
+                    android:lineSpacingExtra="@dimen/line_spacing"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

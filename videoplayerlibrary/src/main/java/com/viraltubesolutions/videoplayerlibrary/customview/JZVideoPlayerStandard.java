@@ -1,11 +1,9 @@
 package com.viraltubesolutions.videoplayerlibrary.customview;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -336,7 +334,8 @@ public class JZVideoPlayerStandard extends JZVideoPlayer {
     @Override
     public void showWifiDialog(int action) {
         super.showWifiDialog(action);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        WIFI_TIP_DIALOG_SHOWED = true;
+       /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(getResources().getString(R.string.tips_not_wifi));
         builder.setPositiveButton(getResources().getString(R.string.tips_not_wifi_confirm), new DialogInterface.OnClickListener() {
             @Override
@@ -367,7 +366,7 @@ public class JZVideoPlayerStandard extends JZVideoPlayer {
                 }
             }
         });
-        builder.create().show();
+        builder.create().show();*/
     }
 
     @Override

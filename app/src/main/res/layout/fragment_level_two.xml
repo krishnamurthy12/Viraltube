@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/leveltwoMainlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/leveltwoMainlayout"
     tools:context="com.viraltubesolutions.viraltubeapp.fragments.LevelTwoFragment">
 
     <LinearLayout

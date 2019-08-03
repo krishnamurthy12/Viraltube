@@ -16,6 +16,7 @@ import android.widget.Button;
 
 import com.viraltubesolutions.viraltubeapp.R;
 import com.viraltubesolutions.viraltubeapp.activities.LoginActivity;
+import com.viraltubesolutions.viraltubeapp.utils.ButtonClickEffect;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,6 +51,8 @@ public class LogOutDialogFragment extends DialogFragment implements View.OnClick
         Typeface candaraTypeface = Typeface.createFromAsset(assetManager, "Fonts/candara.ttf");
         mcancel.setTypeface(candaraTypeface);
         mlogout.setTypeface(candaraTypeface);
+        ButtonClickEffect.addClickEffect(mcancel);
+        ButtonClickEffect.addClickEffect(mlogout);
 
         mcancel.setOnClickListener(this);
         mlogout.setOnClickListener(this);
@@ -63,6 +66,7 @@ public class LogOutDialogFragment extends DialogFragment implements View.OnClick
             SharedPreferences pref=getActivity().getSharedPreferences("LogIn",Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=pref.edit();
             editor.putBoolean("isLoggedin",false);
+            editor.clear();
             editor.apply();
             Intent logout=new Intent(context,LoginActivity.class);
             startActivity(logout);
@@ -70,6 +74,7 @@ public class LogOutDialogFragment extends DialogFragment implements View.OnClick
         }
         if(id== R.id.vB_flo_cancel)
         {
+
             dismiss();
         }
 

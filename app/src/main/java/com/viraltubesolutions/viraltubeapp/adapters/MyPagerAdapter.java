@@ -25,12 +25,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         this.no_of_pages=numofPages;
     }
 
-    public MyPagerAdapter(FragmentManager fm, SearchView.OnQueryTextListener context, List<Datum> mArrayList) {
-        super(fm);
-        this.context = context;
-           }
-
-
     @Override
     public Fragment getItem(int position) {
         switch (position)
@@ -59,39 +53,5 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return no_of_pages;
     }
- /*   @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
 
-                if (charString.isEmpty()) {
-                    mFilteredList = mArrayList;
-                } else {
-                    ArrayList<Datum> filteredList = new ArrayList<>();
-
-                    for (Datum datum : mArrayList) {
-
-                        if (datum.getTitle().toLowerCase().contains(charString)) {
-
-                            filteredList.add(datum);
-                        }
-                    }
-                    mFilteredList = filteredList;
-                }
-
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = mFilteredList;
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                mFilteredList = (ArrayList<Datum>) results.values;
-                notifyDataSetChanged();
-
-            }
-        };
-    }*/
 }

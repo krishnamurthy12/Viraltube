@@ -6,12 +6,11 @@
     tools:context="com.viraltubesolutions.viraltubeapp.fragments.UploadsFragment">
 
     <RelativeLayout
-        android:id="@+id/parent_layout_upload_design"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff">
 
-        <com.viraltubesolutions.videoplayerlibrary.customview.JZVideoPlayerStandard
+        <cn.jzvd.JZVideoPlayerStandard
             android:id="@+id/videoView"
             android:layout_width="match_parent"
             android:layout_height="300dp"

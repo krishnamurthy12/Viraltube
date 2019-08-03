@@ -3,6 +3,7 @@ package com.viraltubesolutions.viraltubeapp.adapters;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,25 +11,39 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.viraltubesolutions.videoplayerlibrary.customview.JZVideoPlayerStandard;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.numberOfViews.NumOfViewsResponse;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.numberOfVotes.NumOfVotesResponse;
 import com.viraltubesolutions.viraltubeapp.R;
+import com.viraltubesolutions.viraltubeapp.activities.HomePageActivity;
 import com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView;
+import com.viraltubesolutions.viraltubeapp.likeanimation.LikeButton;
 import com.viraltubesolutions.viraltubeapp.utils.ViralTubeAPI;
 
 import java.io.ByteArrayOutputStream;
 
+import cn.jzvd.JZVideoPlayerStandard;
 import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,6 +61,8 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
     int numOfvotes;
     int numOfViews;
     Context context;
+    static String finalvideourl;
+    static  String finalthumburl;
     //ArrayList<ShareResponse> arrayList;
     String[] z;
 
@@ -62,8 +79,12 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
     public class MyHolder extends RecyclerView.ViewHolder {
         public MyCustomTextView title, views, votes;
-        ImageView mVotes,mPromote,mShare,mContact;
+        ImageView /*mVotes,*/mPromote,mShare,mContact;
         JZVideoPlayerStandard jzVideoPlayerStandard;
+        LinearLayout mVoteLayout, mShareLayout, mPromoteLayout, mContactLayout;
+        WebView webview;
+        LikeButton animatedLike;
+        TextView txt;
 
 
         public MyHolder(View itemView) {
@@ -73,12 +94,65 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
             votes = itemView.findViewById(R.id.vT_ssa_votes);
             jzVideoPlayerStandard =itemView.findViewById(R.id.videoplayer_ssa);
 
-            mVotes=itemView.findViewById(R.id.vI_ssa_vote);
+            //mVotes=itemView.findViewById(R.id.vI_ssa_vote);
             mPromote=itemView.findViewById(R.id.vI_ssa_promote);
             mShare=itemView.findViewById(R.id.vI_ssa_share);
             mContact=itemView.findViewById(R.id.vI_ssa_contact);
 
+            animatedLike=(LikeButton) itemView.findViewById(R.id.vl_likebtn);
+            txt= (TextView) itemView.findViewById(R.id.textclick1);
+            webview = itemView.findViewById(R.id.help_webview1);
+
+            mVoteLayout=itemView.findViewById(R.id.vote_layout);
+            mPromoteLayout=itemView.findViewById(R.id.promote_layout);
+            mShareLayout=itemView.findViewById(R.id.share_layout);
+            mContactLayout=itemView.findViewById(R.id.contact_layout);
+
         }
+    }
+    private void shareDeepLink(String deepLink) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Firebase Deep Link");
+        intent.putExtra(Intent.EXTRA_TEXT, deepLink);
+
+        context.startActivity(intent);
+    }
+    public void shortlinkBuild(@NonNull String videouri, @NonNull String imageuri, @NonNull String vidtitle, int minVersion)  {
+
+        Uri video=Uri.parse(videouri);
+        Log.d("sharingparameters",video.toString()+"\n");
+        Log.d("sharingparameters",imageuri);
+        Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse(videouri))
+                .setDynamicLinkDomain("jv5e5.app.goo.gl")
+                .setAndroidParameters(
+                        new DynamicLink.AndroidParameters.Builder("com.viraltubesolutions.viraltubeapp")
+                                .setMinimumVersion(minVersion)
+                                .build())
+                .setSocialMetaTagParameters(
+                        new DynamicLink.SocialMetaTagParameters.Builder()
+                                .setTitle(vidtitle)
+                                .setDescription("This link works whether the app is installed or not!")
+                                .setImageUrl(Uri.parse(imageuri))
+                                .build())
+                .buildShortDynamicLink()
+                .addOnCompleteListener(new OnCompleteListener<ShortDynamicLink>() {
+                    @Override
+                    public void onComplete(@NonNull Task<ShortDynamicLink> task) {
+                        if (task.isSuccessful()) {
+                            // Short link created
+                            Uri shortLink = task.getResult().getShortLink();
+                            Uri flowchartLink = task.getResult().getPreviewLink();
+                            Log.d("generatedshortlink",shortLink.toString());
+                            shareDeepLink(shortLink.toString());
+                        } else {
+                            // Error
+                            // ...
+                            Log.d("generatedshortlink","failed to generate short link");
+                        }
+                    }
+                });
     }
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -92,34 +166,36 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
        /* String thumburl=String.valueOf(z[8]).replaceAll("\\\\", File.separator);
         String videourl=String.valueOf(z[3]).replaceAll("\\\\",File.separator);*/
-        String thumburl=String.valueOf(z[8]).replace('\\','/');
-        String videourl=String.valueOf(z[3]).replace('\\','/');
-        String finalvideourl=videourl.replaceAll("////","//");
-        String finalthumburl=thumburl.replaceAll("////","//");
+        String thumburl = String.valueOf(z[8]).replace('\\', '/');
+        String videourl = String.valueOf(z[3]).replace('\\', '/');
+        finalvideourl = videourl.replaceAll("////", "//");
+        finalthumburl = thumburl.replaceAll("////", "//");
 
 
-        Log.d("replacedurl",finalvideourl+"   "+finalthumburl);
+        Log.d("replacedurl", finalvideourl + "   " + finalthumburl);
 
 
         if (z[1].equalsIgnoreCase("1")) {
-            holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
+            holder.animatedLike.setLiked(true);
+            //holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
             holder.votes.setText(z[6] + " Votes");
 
         } else {
-            holder.mVotes.setImageResource(R.drawable.vote);
+            holder.animatedLike.setLiked(false);
+            ///holder.mVotes.setImageResource(R.drawable.vote);
             holder.votes.setText(z[6] + " Votes");
 
         }
 
-        numOfViews =Integer.parseInt(String.valueOf(z[7]));
-        numOfvotes =Integer.parseInt(String.valueOf(z[6]));
+        numOfViews = Integer.parseInt(String.valueOf(z[7]));
+        numOfvotes = Integer.parseInt(String.valueOf(z[6]));
 
         holder.title.setText(z[5]);
         holder.views.setText(z[7] + " Views");
         holder.votes.setText(z[6] + " Votes");
 
 
-        holder.jzVideoPlayerStandard.setUp(finalvideourl.trim(), JZVideoPlayerStandard.SCREEN_LAYOUT_NORMAL, " ");
+        holder.jzVideoPlayerStandard.setUp(finalvideourl.trim(), JZVideoPlayerStandard.SCREEN_WINDOW_NORMAL, " ");
         holder.jzVideoPlayerStandard.progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -133,7 +209,7 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
                     ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-                    Call<NumOfViewsResponse> call = viralTubeAPI.getViews(mUserID,z[4]);
+                    Call<NumOfViewsResponse> call = viralTubeAPI.getViews(mUserID, z[4]);
                     //Call<NumOfViewsResponse> call =  viralTubeAPI.getViews(mUserID,mlist.get(position).getVideoId());
                     call.enqueue(new Callback<NumOfViewsResponse>() {
                         @Override
@@ -173,9 +249,14 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
                 .into(holder.jzVideoPlayerStandard.thumbImageView);
 
 
-        holder.mVotes.setOnClickListener(new View.OnClickListener() {
+        holder.mVoteLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.animatedLike.check(1);
+                if(!holder.animatedLike.isLiked())
+                {
+                    holder.animatedLike.callOnClick();
+                }
 
 
                 Retrofit retrofit = new Retrofit.Builder()
@@ -184,20 +265,28 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
                         .build();
                 ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-                Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID,z[4]);
+                Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID, z[4]);
                 //Call<NumOfVotesResponse> call = viralTubeAPI.getVotes(mUserID, mlist.get(position).getVideoId());
                 call.enqueue(new Callback<NumOfVotesResponse>() {
                     @Override
                     public void onResponse(Call<NumOfVotesResponse> call, Response<NumOfVotesResponse> response) {
+                        holder.animatedLike.check(0);
                         if (response.body().getRESPONSECODE().equalsIgnoreCase("200")) {
-                            numOfvotes =Integer.parseInt(String.valueOf(z[6])) + 1;
-                            holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
+
+                            numOfvotes = Integer.parseInt(String.valueOf(z[6])) + 1;
+                            //holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
                             holder.votes.setText(numOfvotes + " Votes");
+                            holder.animatedLike.setLiked(true);
+
                         } else if (response.body().getRESPONSECODE().equalsIgnoreCase("405")) {
-                            Snackbar.make(holder.mVotes, "Sorry you can vote only once", Snackbar.LENGTH_SHORT).show();
-                            holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
+                            holder.animatedLike.setLiked(true);
+                            Snackbar.make(holder.mVoteLayout, "Sorry you can vote only once", Snackbar.LENGTH_SHORT).show();
+                            //holder.mVotes.setImageResource(R.drawable.heart_shape_blued);
                             holder.votes.setText(z[6] + " Votes");
 
+                        }
+                        else {
+                            holder.animatedLike.setLiked(false);
                         }
 
                     }
@@ -210,11 +299,22 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
 
             }
         });
-        holder.mShare.setOnClickListener(new View.OnClickListener() {
+        holder.mShareLayout.setOnClickListener(new View.OnClickListener() {
+            String videoUrl = finalvideourl.trim();
+            String vidTitle = z[5];
+            String thumburi = finalthumburl;
+
             @Override
             public void onClick(View v) {
+                holder.webview.loadUrl(thumburi);
+                holder.webview.setWebViewClient(new WebViewClient() {
+                    public void onPageFinished(WebView view, String url) {
+                        String myResult = holder.webview.getUrl();
+                        shortlinkBuild(videoUrl, myResult, vidTitle, 1);
+                    }
+                });
 
-                Intent shareIntent = new Intent();
+               /* Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.setType("image");
                 //shareIntent.setType("text/plain");
@@ -223,11 +323,31 @@ public class SharedVideoAdapter extends RecyclerView.Adapter<SharedVideoAdapter.
                         z[5] + "\n file:" + z[3]);
 
                 if (shareIntent.resolveActivity(context.getPackageManager()) != null) {
-                    context.startActivity(Intent.createChooser(shareIntent, "Share using"));
-                }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share using"));*/
+            }
+        });
+
+        holder.mContactLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom);
+                holder.mContact.startAnimation(animation);
+                ((HomePageActivity) context).viewPager.setCurrentItem(3);
+                SharedPreferences videoIdPreference = context.getSharedPreferences("VideoIDPreference", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = videoIdPreference.edit();
+                editor.putString("videoID",z[4]);
+                editor.apply();
+            }
+        });
+
+        holder.txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mVoteLayout.callOnClick();
             }
         });
     }
+
         @TargetApi(Build.VERSION_CODES.M)
         public static Bitmap getBitmapFromView(View view) {
             //Define a bitmap with the same size as the view

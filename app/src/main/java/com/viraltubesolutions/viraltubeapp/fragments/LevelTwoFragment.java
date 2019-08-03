@@ -5,29 +5,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
+import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.checkUserPayment.CheckUserPayment;
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.selfVoteCount.SelfVoteCountResponse;
 import com.viraltubesolutions.viraltubeapp.R;
 import com.viraltubesolutions.viraltubeapp.activities.HomePageActivity;
-import com.viraltubesolutions.viraltubeapp.activities.MPSActivity;
+import com.viraltubesolutions.viraltubeapp.activities.ViralTubePaymentActivity;
+import com.viraltubesolutions.viraltubeapp.utils.ButtonClickEffect;
 import com.viraltubesolutions.viraltubeapp.utils.OnResponseListener;
 import com.viraltubesolutions.viraltubeapp.utils.ViralTubeUtils;
 import com.viraltubesolutions.viraltubeapp.utils.WebServices;
 
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class LevelTwoFragment extends Fragment implements OnResponseListener,View.OnClickListener {
     View view;
     LinearLayout mPaymentlayout,mShortageVoteslayout;
@@ -35,12 +41,16 @@ public class LevelTwoFragment extends Fragment implements OnResponseListener,Vie
     Button mPay,mGotoLevelOne;
     Context context;
     String userID;
+    private String txnid;
+    private String user_name;
+    private String user_phone;
+    private String user_adress;
+    String user_email;
+    String amt = null;
+    MenuItem filter;
 
 
-    public LevelTwoFragment() {
-        // Required empty public constructor
-    }
-
+/*Execution flow onattach=>oncreate=>oncreateview=>onactivitycreated=>onstart=>onresume*/
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -67,7 +77,29 @@ public class LevelTwoFragment extends Fragment implements OnResponseListener,Vie
 
         SharedPreferences preferences = context.getSharedPreferences("LogIn", MODE_PRIVATE);
         userID=preferences.getString("userID",null);
+        user_name=preferences.getString("userName", null);
+        user_phone=preferences.getString("userNumber", null);
+        user_email=preferences.getString("userEmail", null);
+
+        amt="610.000";
+        //Double doubleAmt = Double.valueOf(amt);
+        //amt = doubleAmt.toString();
+
+
     }
+
+    private void callCheckUserPaymentAPI() {
+
+        if (ViralTubeUtils.isConnectingToInternet(context)) {
+
+            WebServices<CheckUserPayment> response=new WebServices<CheckUserPayment>(LevelTwoFragment.this);
+            response.checkUserPayment(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.checkUserPayment,userID);
+        } else {
+            // Toast.makeText(context, ""+R.string.err_msg_nointernet, Toast.LENGTH_SHORT).show();
+            Snackbar.make(mPay, R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
     public void callSelfVoteCountAPI()
     {
         if (ViralTubeUtils.isConnectingToInternet(getContext())) {
@@ -81,56 +113,59 @@ public class LevelTwoFragment extends Fragment implements OnResponseListener,Vie
     }
 
     @Override
-    public void onResponse(Object response, WebServices.ApiType URL, boolean isSucces) {
-        switch (URL)
-        {
-            case getSelfVotecount:
-                SelfVoteCountResponse voteCountResponse= (SelfVoteCountResponse) response;
-                if(isSucces)
-                {
-                    if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("200"))
-                    {
-                        if(voteCountResponse.getVoteCount()>=1)
-                        {
-                            callPaymentGateway();
-
-                        }
-                        else
-                        {
-                            callShortageOfVotes();
-                        }
-
-                    }
-                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("409"))
-                    {
-                        Snackbar.make(view,"Invalid parameters", Snackbar.LENGTH_SHORT).show();
-
-                    }
-                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("403"))
-                    {
-                        Snackbar.make(view,"database error", Snackbar.LENGTH_SHORT).show();
-
-                    }
-                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("503"))
-                    {
-                        Snackbar.make(view,"Invalid method", Snackbar.LENGTH_SHORT).show();
-
-                    }
-
-                }
-                break;
-        }
-
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.leveltwomenu, menu);
+        filter=menu.findItem(R.id.filter);
+        SearchView searchView= (SearchView) MenuItemCompat.getActionView(filter);
+        search(searchView);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void search(SearchView searchView) {
+        // refresh.setVisible(false);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                //levelOneAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
     public void callPaymentGateway()
     {
         mPaymentlayout.setVisibility(View.VISIBLE);
+        ButtonClickEffect.addClickEffect(mPay);
         mPay.setOnClickListener(this);
 
     }
     public void callShortageOfVotes()
     {
         mShortageVoteslayout.setVisibility(View.VISIBLE);
+        ButtonClickEffect.addClickEffect(mGotoLevelOne);
         mGotoLevelOne.setOnClickListener(this);
 
     }
@@ -161,11 +196,97 @@ public class LevelTwoFragment extends Fragment implements OnResponseListener,Vie
     }
     public void integrateGateway()
     {
-        Toast.makeText(context, "Integrate gateway", Toast.LENGTH_SHORT).show();
-        Intent paymentIntent=new Intent(context, MPSActivity.class);
+        Intent paymentIntent = new Intent(context, ViralTubePaymentActivity.class);
         startActivity(paymentIntent);
         getActivity().overridePendingTransition(R.anim.slide_in_from_right, R.anim.slide_in_from_right);
 
+    }
+
+    @Override
+    public void onResponse(Object response, WebServices.ApiType URL, boolean isSucces) {
+        switch (URL)
+        {
+            case getSelfVotecount:
+                SelfVoteCountResponse voteCountResponse= (SelfVoteCountResponse) response;
+                if(isSucces)
+                {
+                    if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("200"))
+                    {
+                        if(voteCountResponse.getVoteCount()>=100)
+                        {
+                            callCheckUserPaymentAPI();
+                            //callPaymentGateway();
+
+                        }
+                        else
+                        {
+                            callShortageOfVotes();
+                        }
+
+                    }
+                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("409"))
+                    {
+                        Snackbar.make(view,"Invalid parameters", Snackbar.LENGTH_SHORT).show();
+
+                    }
+                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("403"))
+                    {
+                        Snackbar.make(view,"database error", Snackbar.LENGTH_SHORT).show();
+
+                    }
+                    else if(voteCountResponse.getRESPONSECODE().equalsIgnoreCase("503"))
+                    {
+                        Snackbar.make(view,"Invalid method", Snackbar.LENGTH_SHORT).show();
+
+                    }
+
+                }
+                break;
+            case checkUserPayment:
+                CheckUserPayment paymentResponse= (CheckUserPayment) response;
+                if(isSucces)
+                {
+                    if(paymentResponse.getRESPONSECODE().equalsIgnoreCase("200") &&
+                            paymentResponse.getPayment().equalsIgnoreCase("1"))
+                    {
+                        Fragment fragment = new AfterPaymentLevelTwoFragment();
+                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.leveltwoMainlayout, fragment);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                            Snackbar.make(mPay, "Transaction Successul", Snackbar.LENGTH_SHORT).show();
+                    }
+                    else if(paymentResponse.getRESPONSECODE().equalsIgnoreCase("409"))
+                    {
+                        /*Fragment fragment = new AfterPaymentLevelTwoFragment();
+                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.leveltwoMainlayout, fragment);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();*/
+                        callPaymentGateway();
+                        //Snackbar.make(mPay,"Invalid UserID",Snackbar.LENGTH_SHORT).show();
+
+                    }
+                    else if(paymentResponse.getRESPONSECODE().equalsIgnoreCase("403"))
+                    {
+                        Snackbar.make(mPay,"Database error",Snackbar.LENGTH_SHORT).show();
+
+                    }
+
+                    else if(paymentResponse.getRESPONSECODE().equalsIgnoreCase("503"))
+                    {
+                        Snackbar.make(mPay,"Invalid method",Snackbar.LENGTH_SHORT).show();
+
+                    }
+
+                }
+                else {
+                    Snackbar.make(mPay,"Check user payment API call Failed",Snackbar.LENGTH_SHORT).show();
+
+                }
+        }
 
     }
 

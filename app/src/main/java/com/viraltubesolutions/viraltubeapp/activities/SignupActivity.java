@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,14 +18,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.viraltubesolutions.viraltubeapp.API.responsepojoclasses.userSignUp.UserSignUpResults;
 import com.viraltubesolutions.viraltubeapp.R;
 import com.viraltubesolutions.viraltubeapp.customs.MyCustomEditText;
 import com.viraltubesolutions.viraltubeapp.customs.MyCustomTextView;
+import com.viraltubesolutions.viraltubeapp.utils.ButtonClickEffect;
 import com.viraltubesolutions.viraltubeapp.utils.OnResponseListener;
 import com.viraltubesolutions.viraltubeapp.utils.ViralTubeUtils;
 import com.viraltubesolutions.viraltubeapp.utils.WebServices;
@@ -35,11 +35,10 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
     MyCustomEditText mUserName, mEmail, mPhoneNum, mPassword, mAge, mLocation,mViral,mTube;
     MyCustomTextView mTermsAndConditionsText;
     Spinner mGender;
-    RadioGroup mUserType;
-    RadioButton mIndividual, mCollege;
+
     Button mRegister;
     CheckBox mTermsAndConditionsCheck;
-    String userName, email, mobile, password,age,gender, location;
+    static String userName, email, mobile, password,age,gender, location;
     ProgressDialog progressDialog=null;
     SpotsDialog dialog;
     String signUpResponse="";
@@ -63,17 +62,15 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
 
         //TextViews
         mTermsAndConditionsText = (MyCustomTextView) findViewById(R.id.vT_as_terms_condition);
+        //ButtonClickEffect.addClickEffect(mTermsAndConditionsText);
 
         //Spinner
         mGender = (Spinner) findViewById(R.id.vS_as_gender);
 
-        //RadioGroup and RadioButtons
-        mUserType = (RadioGroup) findViewById(R.id.signup_radiogroup_layout);
-        mIndividual = (RadioButton) findViewById(R.id.vR_as_individual);
-        mCollege = (RadioButton) findViewById(R.id.vR_as_college);
-
         //Button
         mRegister = (Button) findViewById(R.id.vB_as_signup);
+
+        ButtonClickEffect.addClickEffect(mRegister);
 
         //Checkbox
         mTermsAndConditionsCheck = (CheckBox) findViewById(R.id.vC_as_terms_condition);
@@ -85,27 +82,20 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
     private void setvalues()
     {
         mTermsAndConditionsText.setPaintFlags(mTermsAndConditionsText.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-
-        userName=mUserName.getText().toString();
-        email=mEmail.getText().toString();
-        mobile=mPhoneNum.getText().toString();
-        password=mPassword.getText().toString();
-        age=mAge.getText().toString();
-        //gender=mGender.getSelectedItem().toString();
-        location=mLocation.getText().toString();
+        mTermsAndConditionsText.setOnClickListener(this);
 
         Typeface candaraTypeface = Typeface.createFromAsset( getAssets(), "Fonts/candara.ttf");
         mRegister.setTypeface(candaraTypeface);
-        mIndividual.setTypeface(candaraTypeface);
-        mCollege.setTypeface(candaraTypeface);
 
-        mRegister.setOnClickListener(SignupActivity.this);
+        mRegister.setOnClickListener(this);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mGender.setAdapter(adapter);
         mGender.setOnItemSelectedListener(this);
+
+        //callSignUpAPI(userName, email, mobile, password, age, gender, location);
 
     }
     public void register()
@@ -133,23 +123,25 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
     else if (!validateTermsAndconditions()) {
             return;
         }
-        callSignUpAPI();
+
+        userName=mUserName.getText().toString();
+        email=mEmail.getText().toString();
+        mobile=mPhoneNum.getText().toString();
+        password=mPassword.getText().toString();
+        age=mAge.getText().toString();
+        //gender=mGender.getSelectedItem().toString();
+        location=mLocation.getText().toString();
+        callSignUpAPI(userName,email,mobile,password,age,gender,location);
     }
-    private void callSignUpAPI()
+    private void callSignUpAPI(String userName, String email, String mobile, String password, String age, String gender, String location)
     {
         if (ViralTubeUtils.isConnectingToInternet(getApplicationContext())) {
 
-         /*   progressDialog = new ProgressDialog(this);
-            progressDialog.setCancelable(false);
-            progressDialog.setMessage("Please wait");
-            progressDialog.show();
-
-*/
             dialog = new SpotsDialog(SignupActivity.this,"Registering you Please wait..");
             dialog.show();
             WebServices<UserSignUpResults> webServices = new WebServices<>(SignupActivity.this);
             webServices.userSignUp(WebServices.SELF_UPLOAD_URL, WebServices.ApiType.usersignup,
-                    userName,email, mobile,password,age,gender,location);
+                    userName,email,mobile,password,age,gender,location);
         } else {
             Snackbar.make(mRegister,R.string.err_msg_nointernet, Snackbar.LENGTH_SHORT).show();
         }
@@ -254,12 +246,7 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
             UserSignUpResults results= (UserSignUpResults) response;
             String userID=results.getUserid();
             if (isSucces) {
-                 /*success :200
-                register failed: 302
-                user number already existed: 405
-                user email already existed: 411
-                invalid parameter: 409
-                Server error: 503*/
+
                 if(results.getRESPONSECODE().equalsIgnoreCase("200"))
                 {
                     signUpResponse="200";
@@ -269,6 +256,11 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean("isLoggedin", true);
                     editor.putString("userID", userID);
+                   editor.putString("userName", userName);
+                    editor.putString("userNumber", mobile);
+                    editor.putString("userEmail",email);
+                    editor.putString("password",password);
+                    //editor.putString("image",image);
                     editor.apply();
 
                     Intent intent=new Intent(SignupActivity.this,HomePageActivity.class);
@@ -307,16 +299,50 @@ public class SignupActivity extends AppCompatActivity implements OnResponseListe
 
     @Override
     public void onClick(View v) {
-        try {
-            //InputMethodManager is used to hide the virtual keyboard from the user after finishing the user input
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm.isAcceptingText()) {
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-            }
-        } catch (NullPointerException e) {
-            Log.e("Exception", e.getMessage() + ">>");
+        int id=v.getId();
+        switch (id)
+        {
+            case R.id.vB_as_signup:
+
+                try {
+                    //InputMethodManager is used to hide the virtual keyboard from the user after finishing the user input
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm.isAcceptingText()) {
+                        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    }
+                } catch (NullPointerException e) {
+                    Log.e("Exception", e.getMessage() + ">>");
+                }
+                register();
+                break;
+
+            case R.id.vT_as_terms_condition:
+
+                try {
+                    //InputMethodManager is used to hide the virtual keyboard from the user after finishing the user input
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm.isAcceptingText()) {
+                        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    }
+                } catch (NullPointerException e) {
+                    Log.e("Exception", e.getMessage() + ">>");
+                }
+//                Intent terms=new Intent(SignupActivity.this,TermsnConditions.class);
+//                startActivity(terms);
+//                overridePendingTransition(R.anim.slide_in_from_right,R.anim.slide_in_from_right);
+
+                String url = "http://viraltube.co.in/vt/terms.html";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+
+                Intent terms=new Intent(SignupActivity.this,WebViewActivity.class);
+                terms.putExtra("terms","http://viraltube.co.in/vt/terms.html");
+                startActivity(terms);
+                overridePendingTransition(R.anim.slide_in_from_right,R.anim.slide_in_from_right);
+                break;
+
         }
-        register();
     }
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {

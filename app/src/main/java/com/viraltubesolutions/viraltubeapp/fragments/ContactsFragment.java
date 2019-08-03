@@ -67,7 +67,7 @@ public class ContactsFragment extends Fragment {
 
         //initializing listview
         //lv=(ListView)view.findViewById(R.id.contacts_listview);
-        lv.setAdapter(new ContactsAdapter(getActivity(), R.layout.contactlist_singlerow_appearence,contactList));
+        lv.setAdapter(new ContactsAdapter(getActivity(),R.layout.contactlist_singlerow_appearence,contactList));
         return view;
     }
 

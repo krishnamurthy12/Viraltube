@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_MerchantDetails"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
+</LinearLayout>
+<!--
+
 
     <TextView
-        android:id="@+id/tt_MerchantDetails"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dip"
@@ -18,12 +19,10 @@
         android:textSize="20dip" />
 
     <ScrollView
-        android:id="@+id/mDetails"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <LinearLayout
-            android:id="@+id/llMerchantDetails"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -70,14 +69,14 @@
                 android:inputType="number"
                 android:maxLength="5" />
 
-            <!--  EditText
+            &lt;!&ndash;  EditText
                 android:id="@+id/et_hname"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dip"
                 android:hint="Name"
                 android:inputType="text"
-                android:maxLength="45" /-->
+                android:maxLength="45" /&ndash;&gt;
 
 
 
@@ -104,3 +103,4 @@
     </ScrollView>
 
 </LinearLayout>
+-->

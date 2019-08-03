@@ -3,15 +3,19 @@ package com.viraltubesolutions.viraltubeapp.utils;
 import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Adapter;
 import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -41,9 +45,10 @@ public class WebServices<T> {
     private static OkHttpClient.Builder builder;
 
     public enum ApiType {
-        getOriginalVideos,Getvideos,selfuploadVideo,uploadVideofromGallery,
+        getOriginalVideos,Getvideos,getvideosByLimit,selfuploadVideo,uploadVideofromGallery,
         userlogin,usersignup,getViews,getvotes,getContacts,getSelfVotecount,
-        contactShare,updateFCMKey
+        contactShare,updateFCMKey,payment,checkUserPayment,afterPayment,catagories,subCatagories,uploadProfilePic,
+        videoUploadLimit,forgotPassword,updatePassword,callUs,abhi
     }
     public static final String BASE_URL="https://viraltube.co.in/viral/";
     public static final String SELF_UPLOAD_URL="https://viraltube.co.in/vt/";
@@ -93,6 +98,15 @@ public class WebServices<T> {
             client.connectTimeout(10000, TimeUnit.SECONDS);
             client.readTimeout(10000, TimeUnit.SECONDS).build();
             client.addInterceptor(loggingInterceptor);
+
+            /*to pass header information with request*/
+            /*client.addInterceptor(new Interceptor() {
+                @Override
+                public okhttp3.Response intercept(Chain chain) throws IOException {
+                    Request request = chain.request().newBuilder().addHeader("parameter", "value").build();
+                    return chain.proceed(request);
+                }
+            });*/
             return client;
         }
         return builder;
@@ -151,7 +165,7 @@ public class WebServices<T> {
 
     }
 
-    public Call<T> getVideos(String api, ApiType apiTypes, String userid) {
+    public Call<T> getVideos(String api, ApiType apiTypes, String userid, int limit) {
 
         apiTypeVariable = apiTypes;
 
@@ -163,13 +177,44 @@ public class WebServices<T> {
 
         ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-        call = (Call<T>) viralTubeAPI.getVideos(userid,"1");
+        call = (Call<T>) viralTubeAPI.getVideos(userid,limit);
         call.enqueue(new Callback<T>() {
 
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
                 t = (T) response.body();
                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+
+        });
+        return call;
+    }
+
+    public Call<T> getVideosbyLimit(String api, ApiType apiTypes, String userid, int limit) {
+
+        apiTypeVariable = apiTypes;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.getVideos(userid,limit);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
             }
 
             @Override
@@ -224,7 +269,7 @@ public class WebServices<T> {
 
         ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-        call = (Call<T>) viralTubeAPI.selfVideoUpload(title,filePath,ftag,userid,type);
+        call = (Call<T>) viralTubeAPI.selfVideoUpload(title,filePath,userid,ftag,type);
         call.enqueue(new Callback<T>() {
 
             @Override
@@ -252,7 +297,7 @@ public class WebServices<T> {
 
         ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
 
-        call = (Call<T>) viralTubeAPI.uploadFromgallery(title,filePath,tag,userid,uploadtype);
+        call = (Call<T>) viralTubeAPI.uploadFromgallery(title,filePath,userid,tag,uploadtype);
         call.enqueue(new Callback<T>() {
 
             @Override
@@ -262,7 +307,6 @@ public class WebServices<T> {
             }
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-                Toast.makeText(context, "Failed to uploaded your video", Toast.LENGTH_SHORT).show();
                 onResponseListner.onResponse(null, apiTypeVariable, false);
             }
         });
@@ -420,6 +464,284 @@ public class WebServices<T> {
         });
     }
 
+
+    public void payment(String api, ApiType apiType,JSONObject data) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.payment(data);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void checkUserPayment(String api, ApiType apiType,String userid) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.checkUserPayment(userid);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void afterPayment(String api, ApiType apiType) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.afterPayment();
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void getcatagories(String api, ApiType apiType) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.getCatagories();
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void getSubCatagories(String api, ApiType apiType,String userid) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.getSubcatagories(userid);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+    public void uploadProfilePic(String api, ApiType apiType,RequestBody userid,MultipartBody.Part filePath) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.updateProfilepicture(userid,filePath);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                Toast.makeText(context, "Failed to uploaded your photo", Toast.LENGTH_SHORT).show();
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void checkUploadLimit(String api, ApiType apiType,String userid) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.checkUploadlimit(userid);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void forgotPassword(String api, ApiType apiType,String mobile) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.forgotpassword(mobile);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void updatePassword(String api, ApiType apiType,String mobile,String password) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.updatePassword(mobile,password);
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+    public void callUs(String api, ApiType apiType) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(api)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.callUs();
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
+
+
+    public void abhi( ApiType apiType) {
+        apiTypeVariable=apiType;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://stock.adverscribe.in/api/controllers/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(builder.build())
+                .build();
+
+        ViralTubeAPI viralTubeAPI = retrofit.create(ViralTubeAPI.class);
+
+        call = (Call<T>) viralTubeAPI.abhiApi();
+        call.enqueue(new Callback<T>() {
+
+            @Override
+            public void onResponse(Call<T> call, Response<T> response) {
+                t = (T) response.body();
+                onResponseListner.onResponse(t, apiTypeVariable, true);
+                Log.d("abhishek","success"+response.message());
+            }
+            @Override
+            public void onFailure(Call<T> call, Throwable t) {
+                Log.d("abhishek","onFailure");
+                onResponseListner.onResponse(null, apiTypeVariable, false);
+            }
+        });
+    }
 
 
 }

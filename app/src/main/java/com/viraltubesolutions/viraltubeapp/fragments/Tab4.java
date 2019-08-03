@@ -92,6 +92,7 @@ public class Tab4 extends Fragment implements OnResponseListener,SwipeRefreshLay
 
         v = inflater.inflate(R.layout.fragment_contacts, container, false);
 
+
         initializeViews();
         return v;
     }
@@ -117,7 +118,7 @@ public class Tab4 extends Fragment implements OnResponseListener,SwipeRefreshLay
             refreshPage.setOnRefreshListener(this);
         }
 */
-        checkPermissions();
+        //checkPermissions();
         new GetContacts().execute();
 
         //new GetContacts().execute();
@@ -161,18 +162,27 @@ public class Tab4 extends Fragment implements OnResponseListener,SwipeRefreshLay
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            checkPermissions();
             if(isPermissionGranted) {
-                dialog = new SpotsDialog(context, "Loading your Contacts please wait...");
-                dialog.show();
-
+                /*dialog = new SpotsDialog(context, "Loading your Contacts please wait...");
+                dialog.show();*/
             }
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (newcontacts.isEmpty()) {
-                getContatcs();
+            if(isPermissionGranted) {
+
+                if (newcontacts.isEmpty()) {
+                    getContatcs();
+                }
+
             }
+            else
+            {
+                Snackbar.make(mRecyclerView,"You dont have permissions to access contacts", Snackbar.LENGTH_SHORT).show();
+            }
+
             //getContatcs();
 
             return null;
@@ -297,10 +307,10 @@ public class Tab4 extends Fragment implements OnResponseListener,SwipeRefreshLay
         switch (URL)
         {
             case getContacts:
-                if(dialog.isShowing())
+               /* if(dialog.isShowing())
                 {
                     dialog.dismiss();
-                }
+                }*/
                 ContactsResponse responsedata= (ContactsResponse) response;
                 contacts=responsedata.getContacts();
                /* for(int i=0;i<contacts.size();i++) {

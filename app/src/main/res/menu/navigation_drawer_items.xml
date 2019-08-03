@@ -7,43 +7,37 @@
             android:icon="@drawable/home"
             android:title="Home" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_home">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_events"
             android:icon="@drawable/event"
             android:title="Events" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_aboutus">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_aboutus"
             android:icon="@drawable/username"
             android:title="About us" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_rateus">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_rateus"
             android:icon="@drawable/star"
             android:title="Rate us" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_feedback">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/feedback"
             android:title="Feed back" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_callus">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_callus"
             android:icon="@drawable/call"
             android:title="Call us" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_logout">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/logout"
